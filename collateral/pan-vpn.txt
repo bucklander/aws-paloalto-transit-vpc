@@ -1,0 +1,545 @@
+config {
+  mgt-config {
+    users {
+      admin {
+        phash $1$pkyifxht$LZkLL0/m3AnLS4Qeg4PEc.;
+        permissions {
+          role-based {
+            superuser yes;
+          }
+        }
+        public-key c3NoLXJzYSBBQUFBQjNOemFDMXljMkVBQUFBREFRQUJBQUFCQVFEWWFUdjJ0amlOckIzZlFWK3NXSXJhOEFMZ0JGRjR6RW9RZ0FsdkpBRWZ1L1Z6eEh3Nll4dk1TMG9FTmZXYWE4SnNxSFkxOTVtQkVuMmFPUEYydEovZE9KKzV
+MOStBZDlVRnpFNjJmNkZZN1AvWXduSWgwN3ZoZlAyN3F3QTQ3S0FKZXFGcDdTcXZNTjZLTXVLY1NIZzYzeitFL0xIVStRV25ISXo3U1h3WXowaFJLNHdDemxneG0xb1pRTWhlYU5wcW5DN1NmS29hcUtvY2Q0MmJSMmJ5SmNYV2JtekxjdTMwY1BicHB2b
+m5wTnZWdG1XajRmdFlPcElkUnNMbDRzWUpGZFZlODA3SiswejhmWWF2ZXZocjZZRDNudS9Nb2YzZEpyOW5kRmVTTlVOQlJ5UGw0WDkvSGxVaUFuMThKWGloQnNLVFJBMC9Xb01uQm9lQktlU2QgYnVjay1wZXJzb25hbAo=;
+      }
+    }
+  }
+  shared {
+    application;
+    application-group;
+    service;
+    service-group;
+    botnet {
+      configuration {
+        http {
+          dynamic-dns {
+            enabled yes;
+            threshold 5;
+          }
+          malware-sites {
+            enabled yes;
+            threshold 5;
+          }
+          recent-domains {
+            enabled yes;
+            threshold 5;
+          }
+          ip-domains {
+            enabled yes;
+            threshold 10;
+          }
+          executables-from-unknown-sites {
+            enabled yes;
+            threshold 5;
+          }
+        }
+        other-applications {
+          irc yes;
+        }
+        unknown-applications {
+          unknown-tcp {
+            destinations-per-hour 10;
+            sessions-per-hour 10;
+            session-length {
+              maximum-bytes 100;
+              minimum-bytes 50;
+            }
+          }
+          unknown-udp {
+            destinations-per-hour 10;
+            sessions-per-hour 10;
+            session-length {
+              maximum-bytes 100;
+              minimum-bytes 50;
+            }
+          }
+        }
+      }
+      report {
+        topn 100;
+        scheduled yes;
+      }
+    }
+  }
+  devices {
+    localhost.localdomain {
+      network {
+        interface {
+          ethernet {
+            ethernet1/1 {
+              layer3 {
+                ipv6 {
+                  neighbor-discovery {
+                    router-advertisement {
+                      enable no;
+                    }
+                  }
+                }
+                ndp-proxy {
+                  enabled no;
+                }
+                lldp {
+                  enable no;
+                }
+                ip {
+                  172.31.16.142/20;
+                }
+              }
+            }
+          }
+          tunnel {
+            units {
+              tunnel.1 {
+                ip {
+                  169.254.10.66/30;
+                }
+                mtu 1427;
+              }
+              tunnel.2 {
+                ip {
+                  169.254.9.98/30;
+                }
+                mtu 1427;
+              }
+            }
+          }
+        }
+        profiles {
+          monitor-profile {
+            default {
+              interval 3;
+              threshold 5;
+              action wait-recover;
+            }
+          }
+        }
+        ike {
+          crypto-profiles {
+            ike-crypto-profiles {
+              default {
+                encryption [ aes-128-cbc 3des];
+                hash sha1;
+                dh-group group2;
+                lifetime {
+                  hours 8;
+                }
+              }
+              Suite-B-GCM-128 {
+                encryption aes-128-cbc;
+                hash sha256;
+                dh-group group19;
+                lifetime {
+                  hours 8;
+                }
+              }
+              Suite-B-GCM-256 {
+                encryption aes-256-cbc;
+                hash sha384;
+                dh-group group20;
+                lifetime {
+                  hours 8;
+                }
+              }
+              ike-crypto-vpn-e7bd24bf-0 {
+                dh-group group2;
+                hash sha1;
+                lifetime {
+                  seconds 28800;
+                }
+                encryption aes-128-cbc;
+              }
+              ike-crypto-vpn-e7bd24bf-1 {
+                dh-group group2;
+                hash sha1;
+                lifetime {
+                  seconds 28800;
+                }
+                encryption aes-128-cbc;
+              }
+            }
+            ipsec-crypto-profiles {
+              default {
+                esp {
+                  encryption [ aes-128-cbc 3des];
+                  authentication sha1;
+                }
+                dh-group group2;
+                lifetime {
+                  hours 1;
+                }
+              }
+              Suite-B-GCM-128 {
+                esp {
+                  encryption aes-128-gcm;
+                  authentication none;
+                }
+                dh-group group19;
+                lifetime {
+                  hours 1;
+                }
+              }
+              Suite-B-GCM-256 {
+                esp {
+                  encryption aes-256-gcm;
+                  authentication none;
+                }
+                dh-group group20;
+                lifetime {
+                  hours 1;
+                }
+              }
+              ipsec-vpn-e7bd24bf-0 {
+                esp {
+                  authentication sha1;
+                  encryption aes-128-cbc;
+                }
+                dh-group group2;
+                lifetime {
+                  seconds 3600;
+                }
+              }
+              ipsec-vpn-e7bd24bf-1 {
+                esp {
+                  authentication sha1;
+                  encryption aes-128-cbc;
+                }
+                dh-group group2;
+                lifetime {
+                  seconds 3600;
+                }
+              }
+            }
+            global-protect-app-crypto-profiles {
+              default {
+                encryption aes-128-cbc;
+                authentication sha1;
+              }
+            }
+          }
+          gateway {
+            ike-vpn-e7bd24bf-0 {
+              protocol {
+                ikev1 {
+                  ike-crypto-profile ike-crypto-vpn-e7bd24bf-0;
+                  exchange-mode main;
+                  dpd {
+                    interval 10;
+                    retry 3;
+                    enable yes;
+                  }
+                }
+                ikev2 {
+                  dpd {
+                    enable no;
+                  }
+                }
+              }
+              authentication {
+                pre-shared-key {
+                  key -AQ==aEE0ukIE9fMwzCnFduM3IuN/E88=Hmojbcj/N+WJ7NiX6lrLPg1DDgLYpUcF4b639LvJHyqaFWIcqITWShf5cs4BWBS0;
+                }
+              }
+              local-address {
+                interface ethernet1/1;
+                ip 172.31.16.142/20;
+              }
+              peer-address {
+                ip 54.153.90.205;
+              }
+              protocol-common {
+                nat-traversal {
+                  enable yes;
+                }
+                fragmentation {
+                  enable no;
+                }
+                passive-mode no;
+              }
+            }
+            ike-vpn-e7bd24bf-1 {
+              protocol {
+                ikev1 {
+                  ike-crypto-profile ike-crypto-vpn-e7bd24bf-1;
+                  exchange-mode main;
+                  dpd {
+                    interval 10;
+                    retry 3;
+                    enable yes;
+                  }
+                }
+                ikev2 {
+                  dpd {
+                    enable no;
+                  }
+                }
+              }
+              authentication {
+                pre-shared-key {
+                  key -AQ==dDDh8+RuWD3SQEh5Zi4nHE879+Y=J2zryKUMVLGZe1vylrZiJn81EH4PdZvbhDba11vNsPUwjn20H7cAMoKS6Qj+Iyz3;
+                }
+              }
+              local-address {
+                interface ethernet1/1;
+                ip 172.31.16.142/20;
+              }
+              peer-address {
+                ip 54.193.107.108;
+              }
+              protocol-common {
+                nat-traversal {
+                  enable yes;
+                }
+                fragmentation {
+                  enable no;
+                }
+              }
+            }
+          }
+        }
+        qos {
+          profile {
+            default {
+              class {
+                class1 {
+                  priority real-time;
+                }
+                class2 {
+                  priority high;
+                }
+                class3 {
+                  priority high;
+                }
+                class4 {
+                  priority medium;
+                }
+                class5 {
+                  priority medium;
+                }
+                class6 {
+                  priority low;
+                }
+                class7 {
+                  priority low;
+                }
+                class8 {
+                  priority low;
+                }
+              }
+            }
+          }
+        }
+        virtual-router {
+          default {
+            protocol {
+              bgp {
+                enable yes;
+                dampening-profile {
+                  default {
+                    cutoff 1.25;
+                    reuse 0.5;
+                    max-hold-time 900;
+                    decay-half-life-reachable 300;
+                    decay-half-life-unreachable 900;
+                    enable yes;
+                  }
+                }
+                router-id 18.220.14.1;
+                install-route yes;
+                local-as 65432;
+                peer-group {
+                  AmazonBGP {
+                    type {
+                      ebgp {
+                        remove-private-as yes;
+                        import-nexthop original;
+                        export-nexthop resolve;
+                      }
+                    }
+                    peer {
+                      amazon-tunnel-vpn-e7bd24bf-0 {
+                        peer-as 7224;
+                        connection-options {
+                          keep-alive-interval 10;
+                          hold-time 30;
+                        }
+                        enable yes;
+                        local-address {
+                          ip 169.254.10.66/30;
+                          interface tunnel.1;
+                        }
+                        peer-address {
+                          ip 169.254.10.65;
+                        }
+                      }
+                      amazon-tunnel-vpn-e7bd24bf-1 {
+                        peer-as 7224;
+                        connection-options {
+                          keep-alive-interval 10;
+                          hold-time 30;
+                        }
+                        enable yes;
+                        local-address {
+                          ip 169.254.9.98/30;
+                          interface tunnel.2;
+                        }
+                        peer-address {
+                          ip 169.254.9.97;
+                        }
+                      }
+                    }
+                    aggregated-confed-as-path yes;
+                    soft-reset-with-stored-info no;
+                    enable yes;
+                  }
+                }
+                routing-options {
+                  graceful-restart {
+                    enable yes;
+                  }
+                }
+              }
+            }
+            interface [ ethernet1/1 tunnel.1 tunnel.2];
+            ecmp {
+              algorithm {
+                ip-modulo;
+              }
+            }
+            routing-table {
+              ip {
+                static-route {
+                  default {
+                    path-monitor {
+                      enable no;
+                      failure-condition any;
+                      hold-time 2;
+                    }
+                    nexthop {
+                      ip-address 172.31.16.1;
+                    }
+                    bfd {
+                      profile None;
+                    }
+                    interface ethernet1/1;
+                    metric 10;
+                    destination 0.0.0.0/0;
+                    route-table {
+                      unicast;
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+        tunnel {
+          ipsec {
+            ipsec-tunnel-1 {
+              auto-key {
+                ipsec-crypto-profile ipsec-vpn-e7bd24bf-0;
+                ike-gateway {
+                  ike-vpn-e7bd24bf-0;
+                }
+              }
+              tunnel-interface tunnel.1;
+              anti-replay yes;
+            }
+            ipsec-tunnel-2 {
+              auto-key {
+                ipsec-crypto-profile ipsec-vpn-e7bd24bf-1;
+                ike-gateway {
+                  ike-vpn-e7bd24bf-1;
+                }
+              }
+              tunnel-interface tunnel.2;
+              anti-replay yes;
+            }
+          }
+        }
+      }
+      deviceconfig {
+        system {
+          type {
+            dhcp-client {
+              send-hostname yes;
+              send-client-id no;
+              accept-dhcp-hostname no;
+              accept-dhcp-domain no;
+            }
+          }
+          update-server updates.paloaltonetworks.com;
+          update-schedule {
+            threats {
+              recurring {
+                weekly {
+                  day-of-week wednesday;
+                  at 01:02;
+                  action download-only;
+                }
+              }
+            }
+          }
+          timezone US/Pacific;
+          service {
+            disable-telnet yes;
+            disable-http yes;
+          }
+          hostname PA-VM;
+        }
+        setting {
+          config {
+            rematch yes;
+          }
+          management {
+            hostname-type-in-syslog FQDN;
+            initcfg {
+              type {
+                dhcp-client {
+                  send-hostname yes;
+                  send-client-id no;
+                  accept-dhcp-hostname no;
+                  accept-dhcp-domain no;
+                }
+              }
+              public-key c3NoLXJzYSBBQUFBQjNOemFDMXljMkVBQUFBREFRQUJBQUFCQVFEWWFUdjJ0amlOckIzZlFWK3NXSXJhOEFMZ0JGRjR6RW9RZ0FsdkpBRWZ1L1Z6eEh3Nll4dk1TMG9FTmZXYWE4SnNxSFkxOTVtQkVuMmFPUEYydEovZ
+E9KKzVMOStBZDlVRnpFNjJmNkZZN1AvWXduSWgwN3ZoZlAyN3F3QTQ3S0FKZXFGcDdTcXZNTjZLTXVLY1NIZzYzeitFL0xIVStRV25ISXo3U1h3WXowaFJLNHdDemxneG0xb1pRTWhlYU5wcW5DN1NmS29hcUtvY2Q0MmJSMmJ5SmNYV2JtekxjdTMwY1B
+icHB2bm5wTnZWdG1XajRmdFlPcElkUnNMbDRzWUpGZFZlODA3SiswejhmWWF2ZXZocjZZRDNudS9Nb2YzZEpyOW5kRmVTTlVOQlJ5UGw0WDkvSGxVaUFuMThKWGloQnNLVFJBMC9Xb01uQm9lQktlU2QgYnVjay1wZXJzb25hbAo=;
+            }
+          }
+        }
+      }
+      vsys {
+        vsys1 {
+          application;
+          application-group;
+          zone {
+            untrust {
+              network {
+                layer3 [ ethernet1/1 tunnel.1 tunnel.2];
+              }
+            }
+          }
+          service;
+          service-group;
+          schedule;
+          rulebase;
+          import {
+            network {
+              interface ethernet1/1;
+            }
+          }
+        }
+      }
+    }
+  }
+}

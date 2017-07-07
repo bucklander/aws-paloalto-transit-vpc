@@ -1,0 +1,281 @@
+ configure
+ edit network ike crypto-profiles ike-crypto-profiles ike-crypto-vpn-1cbd2444-0
+  set dh-group group2
+  set hash sha1
+  set lifetime seconds  28800
+  set encryption aes-128-cbc
+  top
+
+ edit network ike gateway ike-vpn-1cbd2444-0
+  set protocol ikev1 ike-crypto-profile ike-crypto-vpn-1cbd2444-0 exchange-mode main
+  set protocol ikev1 dpd interval 10 retry 3 enable yes
+  set authentication pre-shared-key key 2xk0PXeiawyAhlZXEBQWdgOygzL4gMcr
+  set local-address ip 52.15.228.69
+  set local-address interface ethernet1/1
+  set peer-address ip 52.8.20.168 
+ top
+
+ edit network ike crypto-profiles ipsec-crypto-profiles ipsec-vpn-1cbd2444-0
+  set esp authentication sha1
+  set esp encryption aes-128-cbc
+  set dh-group group2 lifetime seconds 3600
+ top 
+
+ edit network interface tunnel units tunnel.1
+  set ip 169.254.9.90/30
+  set mtu 1427
+ top
+
+set zone untrust network layer3 tunnel.1
+
+set network virtual-router default interface tunnel.1
+
+ edit network tunnel ipsec ipsec-tunnel-1
+  set auto-key ipsec-crypto-profile ipsec-vpn-1cbd2444-0
+  set auto-key ike-gateway ike-vpn-1cbd2444-0
+  set tunnel-interface tunnel.1
+  set anti-replay yes
+ top 
+
+ edit network virtual-router default protocol bgp
+  set router-id 52.15.228.69
+  set install-route yes
+  set enable yes
+  set local-as 65123
+   edit peer-group AmazonBGP
+    edit peer amazon-tunnel-vpn-1cbd2444-0
+     set peer-as 7224
+     set connection-options keep-alive-interval 10
+     set connection-options hold-time 30
+     set enable yes
+     set local-address ip 169.254.9.90/30
+     set local-address interface tunnel.1
+     set peer-address ip 169.254.9.89
+     top
+
+edit network virtual-router default protocol redist-profile Default_to_VPC
+ set filter type static
+ set filter destination 0.0.0.0/0
+ set priority 10
+ set action redist
+top
+
+edit network virtual-router default protocol bgp
+ set allow-redist-default-route yes
+top
+
+edit network virtual-router default protocol bgp redist-rules Default_to_VPC
+ set enable yes
+ set set-origin incomplete
+top
+
+! --------------------------------------------------------------------------------
+! IPSec Tunnel #2
+! --------------------------------------------------------------------------------
+! #1: Internet Key Exchange (IKE) Configuration
+!
+! A policy is established for the supported ISAKMP encryption, 
+! authentication, Diffie-Hellman, lifetime, and key parameters.
+! Please note, these sample configurations are for the minimum requirement of AES128, SHA1, and DH Group 2.
+! You will need to modify these sample configuration files to take advantage of AES256, SHA256, or other DH groups like 2, 14-18, 22, 23, and 24.
+! The address of the external interface for your customer gateway must be a static address. 
+! Your customer gateway may reside behind a device performing network address translation (NAT).
+! To ensure that NAT traversal (NAT-T) can function, you must adjust your firewall !rules to unblock UDP port 4500. If not behind NAT, we recommend disabling NAT-T.
+
+!
+
+ configure
+ edit network ike crypto-profiles ike-crypto-profiles ike-crypto-vpn-1cbd2444-1
+  set dh-group group2
+  set hash sha1
+  set lifetime seconds  28800
+  set encryption aes-128-cbc
+  top
+
+! With local-address IP please append the configured subnet mask (i.e, /30) on the VPN initiating interface (i.e., ethernet 1/1)
+! For example if you have /30 as subnet mask the local-address ip should be 52.15.228.69/30
+
+ edit network ike gateway ike-vpn-1cbd2444-1
+  set protocol ikev1 ike-crypto-profile ike-crypto-vpn-1cbd2444-1 exchange-mode main
+  set protocol ikev1 dpd interval 10 retry 3 enable yes
+  set authentication pre-shared-key key 9ZOQinP4goyAJSCWVJKuPnKg036DXvVC
+  set local-address ip 52.15.228.69
+  set local-address interface ethernet1/1
+  set peer-address ip 52.53.81.209 
+ top
+
+
+! #2: IPSec Configuration
+! 
+! The IPSec transform set defines the encryption, authentication, and IPSec
+! mode parameters.
+!
+! Please note, you may use these additionally supported IPSec parameters for encryption like AES256 and other DH groups like 2, 5, 14-18, 22, 23, and 24.
+!
+ edit network ike crypto-profiles ipsec-crypto-profiles ipsec-vpn-1cbd2444-1
+  set esp authentication sha1
+  set esp encryption aes-128-cbc
+  set dh-group group2 lifetime seconds 3600
+ top
+ 
+
+
+! --------------------------------------------------------------------------------
+! #3: Tunnel Interface Configuration
+!  
+! A tunnel interface is configured to be the logical interface associated  
+! with the tunnel. All traffic routed to the tunnel interface will be 
+! encrypted and transmitted to the VPC. Similarly, traffic from the VPC
+! will be logically received on this interface.
+!
+! Association with the IPSec security association is done through the 
+! "tunnel protection" command.
+!
+! The address of the interface is configured with the setup for your 
+! Customer Gateway.  If the address changes, the Customer Gateway and VPN 
+! Connection must be recreated with Amazon VPC.
+!
+ 
+
+ edit network interface tunnel units tunnel.2
+  set ip 169.254.9.34/30
+  set mtu 1427
+ top
+
+!
+! Tunnel interface needs to be associated to Zone, we are using untrust zone as an example, please adjust according
+!
+
+set zone untrust network layer3 tunnel.2
+
+!
+! Tunnel interface needs to be associated to a virtual router, we are using default as an example, please adjust accordingly
+!
+
+set network virtual-router default interface tunnel.2
+
+ edit network tunnel ipsec ipsec-tunnel-2
+  set auto-key ipsec-crypto-profile ipsec-vpn-1cbd2444-1
+  set auto-key ike-gateway ike-vpn-1cbd2444-1
+  set tunnel-interface tunnel.2
+  set anti-replay yes
+ top
+
+! --------------------------------------------------------------------------------
+
+! #4: Border Gateway Protocol (BGP) Configuration
+!                                                                                     
+! BGP is used within the tunnel to exchange prefixes between the
+! Virtual Private Gateway and your Customer Gateway. The Virtual Private Gateway    
+! will announce the prefix corresponding to your VPC.
+!            
+!
+!
+! The local BGP Autonomous System Number (ASN) (65123)
+! is configured as part of your Customer Gateway. If the ASN must 
+! be changed, the Customer Gateway and VPN Connection will need to be recreated with AWS.
+!
+ 
+
+ edit network virtual-router default protocol bgp
+  set router-id 52.15.228.69
+  set install-route yes
+  set enable yes
+  set local-as 65123
+   edit peer-group AmazonBGP
+    edit peer amazon-tunnel-vpn-1cbd2444-1
+     set peer-as 7224
+     set connection-options keep-alive-interval 10
+     set connection-options hold-time 30
+     set enable yes
+     set local-address ip 169.254.9.34/30
+     set local-address interface tunnel.2
+     set peer-address ip 169.254.9.33
+     top
+
+!
+! Your gateway can advertise a default route 0.0.0.0/0 to AWS VPC for which you would need to create a
+! redistribution profile as follows, allow redistribution of default route and finally  
+! apply the redistribution profile under bgp
+!
+
+edit network virtual-router default protocol redist-profile Default_to_VPC
+ set filter type static
+ set filter destination 0.0.0.0/0
+ set priority 10
+ set action redist
+top
+
+edit network virtual-router default protocol bgp
+ set allow-redist-default-route yes
+top
+
+edit network virtual-router default protocol bgp redist-rules Default_to_VPC
+ set enable yes
+ set set-origin incomplete
+top
+
+! To advertise additional prefixes to Amazon VPC, add these prefixes to the AWS VPC, like a static
+! or directly connected IP subnet (being used in this example, please change interface accordingly) 
+! we need to make a distribution profile and then use under BGP redistribution rules to advertise
+! towards AWS:
+!
+
+edit network virtual-router default protocol redist-profile Export_to_Amazon
+  set filter interface vlan.100
+  set filter type connect
+  set priority 2
+  set action redist
+ top 
+
+!
+! Creating redistribution rule under BGP
+!
+
+edit network virtual-router default protocol bgp redist-rules Export_to_Amazon
+  set enable yes
+  set set-origin incomplete 
+ top
+
+! LAN-CIDR is an object which contains your Local LAN IP addresses.
+! VPC-CIDR is an object which contains your VPC CIDR addresses.
+! If your VPC-CIDR is 10.0.0.0/16, you can configure an object using the following:
+! 
+! set address VPC-CIDR ip-netmask 10.0.0.0/16
+! set address LAN-CIDR ip-netmask 192.168.0.0/16
+!
+
+
+  
+! If tunnel and LAN side network interfaces are in different security zones, 
+! we need to configure NAT examption and put at the top, so that actual IP sources
+! show up on the VPC side for proper route back via tunnel as follows when 
+! LAN side zone is considered as "trust" and tunnel interface being part of "untrust" zone, 
+! please change accordingly:
+!
+  
+edit rulebase nat
+  set rules No_NAT_LAN_VPC to untrust
+  set rules No_NAT_LAN_VPC from trust
+  set rules No_NAT_LAN_VPC source LAN-CIDR
+  set rules No_NAT_LAN_VPC destination VPC-CIDR
+  set rules No_NAT_LAN_VPC service any
+  set rules No_NAT_LAN_VPC disabled no
+ top
+ move rulebase nat rules No_NAT_LAN_VPC top  
+  
+! *** NOTE *** : 
+! If tunnel and LAN side network interfaces are in the different security zones,
+! we need to configure a firewall policy to allow inter-zone communication as well.
+! You can use VPC-CIDR/LAN-CIDR object groups to create firewall policy as well.
+!
+! Please also note that you will need to commit the configuration using "commit" command.
+  
+     
+! Additional Notes and Questions
+!  - Amazon Virtual Private Cloud Getting Started Guide: 
+!       http://docs.amazonwebservices.com/AmazonVPC/latest/GettingStartedGuide
+!  - Amazon Virtual Private Cloud Network Administrator Guide: 
+!       http://docs.amazonwebservices.com/AmazonVPC/latest/NetworkAdminGuide
+!  - XSL Version: 2009-07-15-1119716
+
