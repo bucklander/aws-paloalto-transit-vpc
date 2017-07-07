@@ -26,18 +26,18 @@ config_file = 'transit_vpc_config.txt'
 #These S3 endpoint URLs are provided to support VPC endpoints for S3 in regions such as Frankfort that require explicit-
 #region endpoint definition
 endpoint_url = {
-    "us-east-1" : "https://s3.amazonaws.com",
-    "us-east-2" : "https://s3-us-east-2.amazonaws.com",
-    "us-west-1" : "https://s3-us-west-1.amazonaws.com",
-    "us-west-2" : "https://s3-us-west-2.amazonaws.com",
-    "eu-west-1" : "https://s3-eu-west-1.amazonaws.com",
-    "eu-central-1" : "https://s3-eu-central-1.amazonaws.com",
-    "ap-northeast-1" : "https://s3-ap-northeast-1.amazonaws.com",
-    "ap-northeast-2" : "https://s3-ap-northeast-2.amazonaws.com",
-    "ap-south-1" : "https://s3-ap-south-1.amazonaws.com",
-    "ap-southeast-1" : "https://s3-ap-southeast-1.amazonaws.com",
-    "ap-southeast-2" : "https://s3-ap-southeast-2.amazonaws.com",
-    "sa-east-1" : "https://s3-sa-east-1.amazonaws.com"
+    "us-east-1"         : "https://s3.amazonaws.com",
+    "us-east-2"         : "https://s3-us-east-2.amazonaws.com",
+    "us-west-1"         : "https://s3-us-west-1.amazonaws.com",
+    "us-west-2"         : "https://s3-us-west-2.amazonaws.com",
+    "eu-west-1"         : "https://s3-eu-west-1.amazonaws.com",
+    "eu-central-1"      : "https://s3-eu-central-1.amazonaws.com",
+    "ap-northeast-1"    : "https://s3-ap-northeast-1.amazonaws.com",
+    "ap-northeast-2"    : "https://s3-ap-northeast-2.amazonaws.com",
+    "ap-south-1"        : "https://s3-ap-south-1.amazonaws.com",
+    "ap-southeast-1"    : "https://s3-ap-southeast-1.amazonaws.com",
+    "ap-southeast-2"    : "https://s3-ap-southeast-2.amazonaws.com",
+    "sa-east-1"         : "https://s3-sa-east-1.amazonaws.com"
 }
 
 #Logic to determine when the prompt has been discovered
@@ -80,7 +80,7 @@ def getExistingTunnelId(ssh, vpn_connection_id, tvar):
     output = ''
 
     #FIXME
-    cli_command = 'show configuration security ipsec vpn {}-{} | display set | match bind-interface | no-more\n'.format(vpn_connection_id,tvar)
+    cli_command = 'show interface logical\n'.format(vpn_connection_id,tvar)
     ssh.send(cli_command)
     #vpn-aws-vpn-
     output = prompt(ssh)
@@ -93,8 +93,8 @@ def getExistingTunnelId(ssh, vpn_connection_id, tvar):
     for line in output.split('\n'):
         if 'match bind-interface' not in line:
             for word in line.split(' '):
-                if 'st0' in word:
-                    tunnelNum = int(word.replace('st0.',''))
+                if 'tunnel' in word:
+                    tunnelNum = int(word.replace('tunnel.',''))
 
     if tunnelNum < 0:
         return 0
@@ -213,11 +213,9 @@ def create_paloalto_config(bucket_name, bucket_key, s3_url, bgp_asn, ssh):
     '''
 
     log.info("%s %s with tunnel #%s and #%s.",vpn_status, vpn_connection_id, tunnelId, tunnelId+1)
-    # Create or delete the VRF for this connection
-    if vpn_status == 'delete':    
+    if vpn_status == 'delete':
         config_text = []
-        #config_text.append('cli \n')
-        #config_text.append('configure \n')
+        config_text.append('configure \n')
 
         ipsec_tunnel_var = 0
         for ipsec_tunnel in vpn_connection.getElementsByTagName("ipsec_tunnel"):
@@ -226,29 +224,16 @@ def create_paloalto_config(bucket_name, bucket_key, s3_url, bgp_asn, ssh):
             if tunnelId == 0:
                 return
 
-            config_text.append('delete security ike proposal ike-prop-{}-{}'.format(vpn_connection_id,ipsec_tunnel_var))
-            config_text.append('delete security ike policy ike-pol-{}-{}'.format(vpn_connection_id,ipsec_tunnel_var))
-            config_text.append('delete security ike gateway gw-{}-{}'.format(vpn_connection_id,ipsec_tunnel_var))
-            config_text.append('delete security zones security-zone vpc-{}'.format(vpn_connection_id,tunnelId))
-            config_text.append('delete interfaces st0 unit {}'.format(tunnelId))
-            config_text.append('delete security ipsec proposal ipsec-prop-{}-{}'.format(vpn_connection_id,ipsec_tunnel_var))
-            config_text.append('delete security ipsec policy ipsec-pol-{}-{}'.format(vpn_connection_id,ipsec_tunnel_var))
-            config_text.append('delete security ipsec vpn {}-{}'.format(vpn_connection_id,ipsec_tunnel_var))
-            config_text.append('delete routing-instances vpc-{}'.format(vpn_connection_id))
-            config_text.append('delete routing-instances transit routing-options instance-import policy-{}'.format(vpn_connection_id))
-            config_text.append('delete policy-options policy-statement policy-{}'.format(vpn_connection_id))
-            # Global Policy Configuration
-            config_text.append('delete security policies global policy intervpc match from-zone vpc-{}'.format(vpn_connection_id))
-            config_text.append('delete security policies global policy intervpc match to-zone vpc-{}'.format(vpn_connection_id))
-            config_text.append('delete security policies global policy intervpn match from-zone vpc-{}'.format(vpn_connection_id))
-            config_text.append('delete security policies global policy intervpn match to-zone vpc-{}'.format(vpn_connection_id))
-            config_text.append('delete security policies global policy vpc-2-dc match from-zone vpc-{}'.format(vpn_connection_id))
-            config_text.append('delete security policies global policy dc-2-vpc match to-zone vpc-{}'.format(vpn_connection_id))
-        
-      #------Juniper Delete-----#
+            config_text.append('delete network tunnel ipsec ipsec-tunnel-{} auto-key ike-gateway ike-vpn-{}-{}'.format(tunnelId,vpn_connection_id,ipsec_tunnel_var))
+            config_text.append('delete network ike gateway ike-vpn-{}-{}'.format(vpn_connection_id,ipsec_tunnel_var))
+            config_text.append('delete network ike crypto-profiles ipsec-crypto-profiles ipsec-vpn-{}-{}'.format(vpn_connection_id,ipsec_tunnel_var))
+            config_text.append('delete network ike crypto-profiles ike-crypto-profiles ike-crypto-vpn-{}'.format(vpn_connection_id,tunnelId))
+            config_text.append('delete network virtual-router default protocol bgp peer-group AmazonBGP peer amazon-tunnel-vpn-{}-{}'.format(vpn_connection_id,ipsec_tunnel_var))
+            config_text.append('delete network virtual-router default interface tunnel.{}'.format(tunnelId))
+            config_text.append('delete zone untrust network layer3 tunnel.{}'.format(tunnelId))
+            config_text.append('delete network interface tunnel units tunnel.{}'.format(tunnelId))
     else:
         config_text = []
-        config_text.append('cli \n')
         config_text.append('configure \n')
 
         ipsec_tunnel_var = 0
@@ -373,7 +358,6 @@ def create_paloalto_config(bucket_name, bucket_key, s3_url, bgp_asn, ssh):
             config_text.append('set network virtual-router default protocol bgp redist-rules Default_to_VPC set-origin incomplete')
 
             tunnelId+=1
-        
     log.debug("Conversion complete")
     return config_text
 
@@ -386,12 +370,12 @@ def lambda_handler(event, context):
     log.debug("Getting config")
     stime = time.time()
     config = getTransitConfig(bucket_name, bucket_prefix, endpoint_url[bucket_region], config_file)
-    if 'VSRX1' in bucket_key:
-        vsrx_ip=config['PIP1']
-        vsrx_name='VSRX1'
+    if 'PAVM1' in bucket_key:
+        pavm_ip=config['PIP1']
+        pavm_name='PAVM1'
     else:
-        vsrx_ip=config['PIP2']
-        vsrx_name='VSRX2'
+        pavm_ip=config['PIP2']
+        pavm_name='PAVM2'
     log.info("--- %s seconds ---", (time.time() - stime))
     #Download private key file from secure S3 bucket
     downloadPrivateKey(bucket_name, bucket_prefix, endpoint_url[bucket_region], config['PRIVATE_KEY'])
@@ -404,14 +388,14 @@ def lambda_handler(event, context):
     c = paramiko.SSHClient()
     c.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
-    log.info("Connecting to %s (%s)", vsrx_name, vsrx_ip)
+    log.info("Connecting to %s (%s)", pavm_name, pavm_ip)
     stime = time.time()
     try:
-        c.connect( hostname = vsrx_ip, username = config['USER_NAME'], pkey = k )
+        c.connect( hostname = pavm_ip, username = config['USER_NAME'], pkey = k )
         PubKeyAuth=True
     except paramiko.ssh_exception.AuthenticationException:
         log.error("PubKey Authentication Failed! Connecting with password")
-        c.connect( hostname = vsrx_ip, username = config['USER_NAME'], password = config['PASSWORD'] )
+        c.connect( hostname = pavm_ip, username = config['USER_NAME'], password = config['PASSWORD'] )
         PubKeyAuth=False
     #Need to handle the generic exception case which most likely happens due to single ssh connection restriction.
     #If still no luck after 15 minutes, let it time out. 
@@ -421,19 +405,19 @@ def lambda_handler(event, context):
             i = i + 1
             time.sleep(5)
             try:
-                c.connect( hostname = vsrx_ip, username = config['USER_NAME'], pkey = k )
+                c.connect( hostname = pavm_ip, username = config['USER_NAME'], pkey = k )
                 break
             except:
                 pass
         if(time.time() - stime < 900):
-            log.info("Connected to %s after %s retry(retries)", vsrx_name, i)
+            log.info("Connected to %s after %s retry(retries)", pavm_name, i)
         else:
-            log.info("Connection to %s timedout. Stopped retrying after 15 minutes", vsrx_name)
+            log.info("Connection to %s timedout. Stopped retrying after 15 minutes", pavm_name)
             c.close()
             raise ValueError( "Operation timed out!!" )
 
     log.info("--- %s seconds ---", (time.time() - stime))
-    log.info("Connected to %s",vsrx_ip)
+    log.info("Connected to %s",pavm_ip)
     ssh = c.invoke_shell()
     log.info("%s",prompt(ssh))
     log.info("Creating config.")
@@ -442,11 +426,11 @@ def lambda_handler(event, context):
     log.info("endpoint_url[bucket_region]: %s", endpoint_url[bucket_region])
     log.info("config['BGP_ASN']: %s", config['BGP_ASN'])
     stime = time.time()
-    vsrx_config = create_paloalto_config(bucket_name, bucket_key, endpoint_url[bucket_region], config['BGP_ASN'], ssh)
+    pavm_config = create_paloalto_config(bucket_name, bucket_key, endpoint_url[bucket_region], config['BGP_ASN'], ssh)
     log.info("--- %s seconds ---", (time.time() - stime))
     log.info("Pushing config to router.")
     stime = time.time()
-    pushConfig(ssh,vsrx_config)
+    pushConfig(ssh,pavm_config)
     log.info("--- %s seconds ---", (time.time() - stime))
     ssh.close()
     #Close the ssh client as well
