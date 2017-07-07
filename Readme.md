@@ -1,7 +1,13 @@
-AWS Transit VPC using Palo Alto Marketplace VM appliances instead of Cisco CSR. Use without warranty.
-
+# aws-transit-vpc for Palo Alto Firewalls
+Source code for the AWS Transit VPC customized to use Palo Alto VM appliances versus Cisco CSR.
 Forked from https://github.com/awslabs/aws-transit-vpc
 
-Use of files in this repo are governed by the license contained within each separate directory with the file name “LICENSE.txt.”
- 
-All code, templates and other files in this repo are released on an “AS IS” BASIS, WITHOUT WARRANTIES, CONDITIONS, OR SUPPORT OBLIGATIONS OF ANY KIND, EXPRESS OR IMPLED.
+## Cloudformation templates
+
+- transit-vpc-primary-account.template
+- transit-vpc-second-account.template
+
+## Lambda source code
+
+- transit-vpc-poller.py
+- transit-vpc-push-paloalto-config.py
