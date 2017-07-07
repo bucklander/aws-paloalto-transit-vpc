@@ -166,7 +166,7 @@ def downloadPrivateKey(bucket_name, bucket_prefix, s3_url, prikey):
     s3.download_file(bucket_name,bucket_prefix+prikey, '/tmp/'+prikey)
 
 #Logic to create the appropriate PaloAlto configuration
-def create_jnpr_config(bucket_name, bucket_key, s3_url, bgp_asn, ssh):
+def create_paloalto_config(bucket_name, bucket_key, s3_url, bgp_asn, ssh):
     log.info("Processing %s/%s", bucket_name, bucket_key)
 
     #Download the VPN configuration XML document
@@ -325,184 +325,56 @@ def create_jnpr_config(bucket_name, bucket_key, s3_url, bgp_asn, ssh):
             ipsec_dead_peer_detection_retries=ipsec.getElementsByTagName("dead_peer_detection")[0].getElementsByTagName("retries")[0].firstChild.data
             log.info("ipsec_dead_peer_detection_retries %s", ipsec_dead_peer_detection_retries)
 
-# IPSec Tunnel #1
-# --------------------------------------------------------------------------------
-# #1: Internet Key Exchange (IKE) Configuration
-#
-# A proposal is established for the supported IKE encryption, 
-# authentication, Diffie-Hellman, and lifetime parameters.
-# Please note, these sample configurations are for the minimum requirement of AES128, SHA1, and DH Group 2.
-# You will need to modify these sample configuration files to take advantage of AES256, SHA256, or other DH groups like 2, 14-18, 22, 23, and 24.
-# The address of the external interface for your customer gateway must be a static address. 
-# To ensure that NAT traversal (NAT-T) can function, you must adjust your firewall rules to unblock UDP port 4500. If not behind NAT, we recommend disabling NAT-T.
-#
-            config_text.append('set security ike proposal ike-prop-{}-{} authentication-method pre-shared-keys'.format(vpn_connection_id,ipsec_tunnel_var))
-            config_text.append('set security ike proposal ike-prop-{}-{} authentication-algorithm sha1'.format(vpn_connection_id,ipsec_tunnel_var))
-            config_text.append('set security ike proposal ike-prop-{}-{} encryption-algorithm aes-128-cbc'.format(vpn_connection_id,ipsec_tunnel_var))
-            config_text.append('set security ike proposal ike-prop-{}-{} lifetime-seconds 28800'.format(vpn_connection_id,ipsec_tunnel_var))
-            config_text.append('set security ike proposal ike-prop-{}-{} dh-group group2'.format(vpn_connection_id,ipsec_tunnel_var))
+            config_text.append('set network ike crypto-profiles ike-crypto-profiles ike-crypto-vpn-{}-{} dh-group group2'.format(vpn_connection_id,ipsec_tunnel_var))
+            config_text.append('set network ike crypto-profiles ike-crypto-profiles ike-crypto-vpn-{}-{} hash sha1'.format(vpn_connection_id,ipsec_tunnel_var))
+            config_text.append('set network ike crypto-profiles ike-crypto-profiles ike-crypto-vpn-{}-{} lifetime seconds 28800'.format(vpn_connection_id,ipsec_tunnel_var))
+            config_text.append('set network ike crypto-profiles ike-crypto-profiles ike-crypto-vpn-{}-{} encryption aes-128-cbc'.format(vpn_connection_id,ipsec_tunnel_var))
 
-# An IKE policy is established to associate a Pre Shared Key with the  
-# defined proposal.
-#  
-            config_text.append('set security ike policy ike-pol-{}-{} mode main'.format(vpn_connection_id,ipsec_tunnel_var))
-            config_text.append('set security ike policy ike-pol-{}-{} proposals ike-prop-{}-{}'.format(vpn_connection_id,ipsec_tunnel_var,vpn_connection_id,ipsec_tunnel_var))
-            config_text.append('set security ike policy ike-pol-{}-{} pre-shared-key ascii-text {}'.format(vpn_connection_id,ipsec_tunnel_var,ike_pre_shared_key))
+            config_text.append('set network ike gateway ike-vpn-{}-{} protocol ikev1 ike-crypto-profile ike-crypto-vpn-{}-{} exchange-mode main'.format(vpn_connection_id,ipsec_tunnel_var,vpn_connection_id,ipsec_tunnel_var))
+            config_text.append('set network ike gateway ike-vpn-{}-{} protocol ikev1 dpd interval 10 retry 3 enable yes'.format(vpn_connection_id,ipsec_tunnel_var))
+            config_text.append('set network ike gateway ike-vpn-{}-{} authentication pre-shared-key key {}'.format(vpn_connection_id,ipsec_tunnel_var))
+            config_text.append('set network ike gateway ike-vpn-{}-{} local-address ip {}'.format(vpn_connection_id,ipsec_tunnel_var,vpn_gateway_tunnel_outside_address))
+            config_text.append('set network ike gateway ike-vpn-{}-{} local-address interface ethernet1/1'.format(vpn_connection_id,ipsec_tunnel_var))
+            config_text.append('set network ike gateway ike-vpn-{}-{} peer-address ip {}'.format(vpn_connection_id,ipsec_tunnel_var,vpn_gateway_tunnel_inside_address))
 
-# The IKE gateway is defined to be the Virtual Private Gateway. The gateway 
-# configuration associates a local interface, remote IP address, and
-# IKE policy.
-#
-# This example shows the outside of the tunnel as interface ge-0/0/0.0.
-# This should be set to the interface that IP address 34.206.155.228 is
-# associated with.
-# This address is configured with the setup for your Customer Gateway.
-#
-# If the address changes, the Customer Gateway and VPN Connection must be recreated.
-#
-            config_text.append('set security ike gateway gw-{}-{} ike-policy ike-pol-{}-{}'.format(vpn_connection_id,ipsec_tunnel_var,vpn_connection_id,ipsec_tunnel_var))
-            config_text.append('set security ike gateway gw-{}-{} external-interface ge-0/0/0.0'.format(vpn_connection_id,ipsec_tunnel_var))
-            config_text.append('set security ike gateway gw-{}-{} address {}'.format(vpn_connection_id,ipsec_tunnel_var,vpn_gateway_tunnel_outside_address))
-            config_text.append('set security ike gateway gw-{}-{} no-nat-traversal'.format(vpn_connection_id,ipsec_tunnel_var))
+            config_text.append('set network ike crypto-profiles ipsec-crypto-profiles ipsec-vpn-{}-{} esp authentication sha1'.format(vpn_connection_id,ipsec_tunnel_var))
+            config_text.append('set network ike crypto-profiles ipsec-crypto-profiles ipsec-vpn-{}-{} esp encryption aes-128-cbc'.format(vpn_connection_id,ipsec_tunnel_var))
+            config_text.append('set network ike crypto-profiles ipsec-crypto-profiles ipsec-vpn-{}-{} dh-group group2 lifetime seconds 3600'.format(vpn_connection_id,ipsec_tunnel_var))
 
-# This option enables IPSec Dead Peer Detection, which causes periodic
-# messages to be sent to ensure a Security Association remains operational.
-#
-            config_text.append('set security ike gateway gw-{}-{} dead-peer-detection interval 10 threshold 3'.format(vpn_connection_id,ipsec_tunnel_var))
+            config_text.append('set network interface tunnel units tunnel.{} ip {}/{}'.format(tunnelId,customer_gateway_tunnel_inside_address_ip_address,vpn_gateway_tunnel_inside_address_network_cidr))
+            config_text.append('set network interface tunnel units tunnel.{} mtu 1427'.format(tunnelId))
 
-# Troubleshooting IKE connectivity can be aided by enabling IKE tracing.
-# The configuration below will cause the router to log IKE messages to
-# the 'kmd' log. Run 'show log kmd' to retrieve these logs.
-# set security ike traceoptions file kmd
-# set security ike traceoptions file size 1024768
-# set security ike traceoptions file files 10
-# set security ike traceoptions flag all
+            config_text.append('set zone untrust network layer3 tunnel.{}'.format(tunnelId))
 
-# #2: IPSec Configuration
-#
-# The IPSec proposal defines the protocol, authentication, encryption, and
-# lifetime parameters for our IPSec security association.
-# Please note, you may use these additionally supported IPSec parameters for encryption like AES256 and other DH groups like 1,2, 5, 14-18, 22, 23, and 24.  
-#
-            config_text.append('set security ipsec proposal ipsec-prop-{}-{} protocol esp'.format(vpn_connection_id,ipsec_tunnel_var))
-            config_text.append('set security ipsec proposal ipsec-prop-{}-{} authentication-algorithm hmac-sha1-96'.format(vpn_connection_id,ipsec_tunnel_var))
-            config_text.append('set security ipsec proposal ipsec-prop-{}-{} encryption-algorithm aes-128-cbc'.format(vpn_connection_id,ipsec_tunnel_var))
-            config_text.append('set security ipsec proposal ipsec-prop-{}-{} lifetime-seconds 3600'.format(vpn_connection_id,ipsec_tunnel_var))
+            config_text.append('set network virtual-router default interface tunnel.{}'.format(tunnelId))
 
-# The IPSec policy incorporates the Diffie-Hellman group and the IPSec
-# proposal.
-#
-            config_text.append('set security ipsec policy ipsec-pol-{}-{} perfect-forward-secrecy keys group2'.format(vpn_connection_id,ipsec_tunnel_var))
-            config_text.append('set security ipsec policy ipsec-pol-{}-{} proposals ipsec-prop-{}-{}'.format(vpn_connection_id,ipsec_tunnel_var,vpn_connection_id,ipsec_tunnel_var))
+            config_text.append('set network tunnel ipsec ipsec-tunnel-{} auto-key ipsec-crypto-profile ipsec-vpn-{}-{}'.format(ipsec_tunnel_var,vpn_connection_id,ipsec_tunnel_var))
+            config_text.append('set network tunnel ipsec ipsec-tunnel-{} auto-key ike-gateway ike-vpn-{}-{}'.format(ipsec_tunnel_var,vpn_connection_id,ipsec_tunnel_var))
+            config_text.append('set network tunnel ipsec ipsec-tunnel-{} tunnel-interface tunnel.{}'.format(ipsec_tunnel_var,tunnelId))
+            config_text.append('set network tunnel ipsec ipsec-tunnel-{} anti-replay yes'.format(ipsec_tunnel_var,tunnelId))
 
-# A security association is defined here.
-#
-            config_text.append('set security ipsec vpn {}-{} ike gateway gw-{}-{}'.format(vpn_connection_id,ipsec_tunnel_var,vpn_connection_id,ipsec_tunnel_var))
-            config_text.append('set security ipsec vpn {}-{} ike ipsec-policy ipsec-pol-{}-{}'.format(vpn_connection_id,ipsec_tunnel_var,vpn_connection_id,ipsec_tunnel_var))
-            config_text.append('set security ipsec vpn {}-{} df-bit clear'.format(vpn_connection_id,ipsec_tunnel_var))
-            config_text.append('set security ipsec vpn {}-{} establish-tunnels immediately'.format(vpn_connection_id,ipsec_tunnel_var))
+            config_text.append('set network virtual-router default protocol bgp router-id {}'.format(vpn_gateway_tunnel_outside_address))
+            config_text.append('set network virtual-router default protocol bgp install-route yes')
+            config_text.append('set network virtual-router default protocol bgp enable yes')
+            config_text.append('set network virtual-router default protocol bgp local-as {} peer-group AmazonBGP peer amazon-tunnel-vpn-{}-{} peer-as {}'.format(vpn_gateway_bgp_asn,vpn_connection_id,ipsec_tunnel_var,customer_gateway_bgp_asn))
+            config_text.append('set network virtual-router default protocol bgp local-as {} peer-group AmazonBGP peer amazon-tunnel-vpn-{}-{} connection-options keep-alive-interval 10'.format(vpn_connection_id,ipsec_tunnel_var,vpn_gateway_bgp_asn))
+            config_text.append('set network virtual-router default protocol bgp local-as {} peer-group AmazonBGP peer amazon-tunnel-vpn-{}-{} connection-options hold-time 30'.format(vpn_gateway_bgp_asn,vpn_connection_id,ipsec_tunnel_var))
+            config_text.append('set network virtual-router default protocol bgp local-as {} peer-group AmazonBGP peer amazon-tunnel-vpn-{}-{} enable yes'.format(vpn_gateway_bgp_asn,vpn_connection_id,ipsec_tunnel_var))
+            config_text.append('set network virtual-router default protocol bgp local-as {} peer-group AmazonBGP peer amazon-tunnel-vpn-{}-{} local-address ip {}/{}'.format(vpn_gateway_bgp_asn,vpn_connection_id,ipsec_tunnel_var,customer_gateway_tunnel_inside_address_ip_address,vpn_gateway_tunnel_inside_address_network_cidr))
+            config_text.append('set network virtual-router default protocol bgp local-as {} peer-group AmazonBGP peer amazon-tunnel-vpn-{}-{} local-address interface tunnel.{}'.format(vpn_gateway_bgp_asn,vpn_connection_id,ipsec_tunnel_var,tunnelId))
+            config_text.append('set network virtual-router default protocol bgp local-as {} peer-group AmazonBGP peer amazon-tunnel-vpn-{}-{} peer-address ip {}'.format(vpn_gateway_bgp_asn,vpn_connection_id,ipsec_tunnel_var,vpn_gateway_tunnel_inside_address_ip_address))
 
-# #3: Tunnel Interface Configuration
-#
+            config_text.append('set network virtual-router default protocol redist-profile Default_to_VPC filter type static')
+            config_text.append('set network virtual-router default protocol redist-profile Default_to_VPC filter destination 0.0.0.0/0')
+            config_text.append('set network virtual-router default protocol redist-profile Default_to_VPC priority 10')
+            config_text.append('set network virtual-router default protocol redist-profile Default_to_VPC action redist')
+            config_text.append('set network virtual-router default protocol bgp allow-redist-default-route yes')
+            config_text.append('set network virtual-router default protocol bgp redist-rules Default_to_VPC enable yes')
+            config_text.append('set network virtual-router default protocol bgp redist-rules Default_to_VPC set-origin incomplete')
 
-# The tunnel interface is configured with the internal IP address. The IPSec Policy and IKE gateways
-# are associated with a tunnel interface (st0.1).
-# The tunnel interface ID is assumed; if other tunnels are defined on
-# your router, you will need to specify a unique interface name 
-# (for example, st0.10).
-#
-            config_text.append('set interfaces st0.{} family inet address {}/{}'.format(tunnelId,customer_gateway_tunnel_inside_address_ip_address,vpn_gateway_tunnel_inside_address_network_cidr))
-            config_text.append('set interfaces st0.{} family inet mtu 1436'.format(tunnelId))
-#            config_text.append('set security zones security-zone trust interfaces st0.{}'.format(tunnelId))
-            config_text.append('set security ipsec vpn {}-{} bind-interface st0.{}'.format(vpn_connection_id,ipsec_tunnel_var,tunnelId))
-
-# The security zone protecting external interfaces of the router must be 
-# configured to allow IKE traffic inbound.
-#
-#            config_text.append('set security zones security-zone untrust host-inbound-traffic system-services ike')
-
-# The security zone protecting internal interfaces (including the logical 
-# tunnel interfaces) must be configured to allow BGP traffic inbound.
-#
-#            config_text.append('set security zones security-zone trust host-inbound-traffic protocols bgp')
-
-# This option causes the router to reduce the Maximum Segment Size of
-# TCP packets to prevent packet fragmentation.
-#
-            config_text.append('set security flow tcp-mss ipsec-vpn mss 1379')
-
-# --------------------------------------------------------------------------------
-# #4: Border Gateway Protocol (BGP) Configuration
-#                                                                                     
-# BGP is used within the tunnel to exchange prefixes between the
-# Virtual Private Gateway and your Customer Gateway. The Virtual Private Gateway    
-# will announce the prefix corresponding to your VPC.
-#            
-# Your Customer Gateway may announce a default route (0.0.0.0/0), 
-# which can be done with the EXPORT-DEFAULT policy. 
-#
-# To advertise additional prefixes to Amazon VPC, add additional prefixes to the "default" term
-# EXPORT-DEFAULT policy. Make sure the prefix is present in the routing table of the device with 
-# a valid next-hop.
-#                                                                               
-# The BGP timers are adjusted to provide more rapid detection of outages.       
-# 
-# The local BGP Autonomous System Number (ASN) (64512) is configured
-# as part of your Customer Gateway. If the ASN must be changed, the 
-# Customer Gateway and VPN Connection will need to be recreated with AWS.
-# 
-# We establish a basic route policy to export a default route to the
-# Virtual Private Gateway.      
-            config_text.append('set policy-options policy-statement EXPORT-DEFAULT term default from route-filter 0.0.0.0/0 exact')                                                               
-            config_text.append('set policy-options policy-statement EXPORT-DEFAULT term default then accept')     
-            config_text.append('set policy-options policy-statement EXPORT-DEFAULT term reject then reject')
-#           config_text.append('set protocols bgp group ebgp type external')
-            config_text.append('set routing-instances vpc-{} protocols bgp group ebgp neighbor {} export EXPORT-DEFAULT'.format(vpn_connection_id,vpn_gateway_tunnel_inside_address_ip_address))
-            config_text.append('set routing-instances vpc-{} protocols bgp group ebgp neighbor {} peer-as {}'.format(vpn_connection_id,vpn_gateway_tunnel_inside_address_ip_address,vpn_gateway_bgp_asn))
-            config_text.append('set routing-instances vpc-{} protocols bgp group ebgp neighbor {} hold-time 30'.format(vpn_connection_id,vpn_gateway_tunnel_inside_address_ip_address))
-            config_text.append('set routing-instances vpc-{} protocols bgp group ebgp neighbor {} local-as {}'.format(vpn_connection_id,vpn_gateway_tunnel_inside_address_ip_address,customer_gateway_bgp_asn))
-            config_text.append('set routing-instances vpc-{} protocols bgp group ebgp type external'.format(vpn_connection_id))
-
-### Juniper Specific Configuration
-            config_text.append('set policy-options policy-statement policy-{} term stx from instance vpc-{}'.format(vpn_connection_id,vpn_connection_id))
-            config_text.append('set policy-options policy-statement policy-{} term stx from protocol static'.format(vpn_connection_id))
-            config_text.append('set policy-options policy-statement policy-{} term stx then accept'.format(vpn_connection_id))
-            config_text.append('set policy-options policy-statement policy-{} term bgp-routes from instance vpc-{}'.format(vpn_connection_id,vpn_connection_id))
-            config_text.append('set policy-options policy-statement policy-{} term bgp-routes from protocol bgp'.format(vpn_connection_id))
-            config_text.append('set policy-options policy-statement policy-{} term bgp-routes then accept'.format(vpn_connection_id))
-            config_text.append('set policy-options policy-statement policy-{} term default-drop from instance vpc-{}'.format(vpn_connection_id,vpn_connection_id))
-            config_text.append('set policy-options policy-statement policy-{} term default-drop then reject'.format(vpn_connection_id))
-
-            config_text.append('set security zones security-zone vpc-{} host-inbound-traffic system-services ike'.format(vpn_connection_id))
-            config_text.append('set security zones security-zone vpc-{} host-inbound-traffic protocol bgp'.format(vpn_connection_id))
-            config_text.append('set security zones security-zone vpc-{} interfaces st0.{}'.format(vpn_connection_id,tunnelId))
-
-
-            config_text.append('set routing-instances vpc-{} instance-type virtual-router'.format(vpn_connection_id))
-            config_text.append('set routing-instances vpc-{} interface st0.{}'.format(vpn_connection_id,tunnelId))
-            config_text.append('set routing-instances vpc-{} routing-options static route 0.0.0.0/0 next-table transit.inet.0'.format(vpn_connection_id))
-            config_text.append('set routing-instances vpc-{} routing-options autonomous-system {}'.format(vpn_connection_id,customer_gateway_bgp_asn))
-            config_text.append('set routing-instances vpc-{} protocols bgp multihop'.format(vpn_connection_id))
-
-            config_text.append('set routing-instances transit routing-options instance-import policy-{}'.format(vpn_connection_id))
-			
-			 #Adding Global Policies
-            config_text.append('set security policies global policy intervpc match from-zone vpc-{}'.format(vpn_connection_id))
-            config_text.append('set security policies global policy intervpc match to-zone vpc-{}'.format(vpn_connection_id))
-
-            config_text.append('set security policies global policy intervpn match from-zone vpc-{}'.format(vpn_connection_id))
-            config_text.append('set security policies global policy intervpn match to-zone vpc-{}'.format(vpn_connection_id))
-
-            config_text.append('set security policies global policy vpc-2-dc match from-zone vpc-{}'.format(vpn_connection_id))
-            config_text.append('set security policies global policy dc-2-vpc match to-zone vpc-{}'.format(vpn_connection_id))
-            
-            
-            ################################
-    
             tunnelId+=1
         
     log.debug("Conversion complete")
-    #config_text = []
     return config_text
 
 def lambda_handler(event, context):
@@ -570,7 +442,7 @@ def lambda_handler(event, context):
     log.info("endpoint_url[bucket_region]: %s", endpoint_url[bucket_region])
     log.info("config['BGP_ASN']: %s", config['BGP_ASN'])
     stime = time.time()
-    vsrx_config = create_jnpr_config(bucket_name, bucket_key, endpoint_url[bucket_region], config['BGP_ASN'], ssh)
+    vsrx_config = create_paloalto_config(bucket_name, bucket_key, endpoint_url[bucket_region], config['BGP_ASN'], ssh)
     log.info("--- %s seconds ---", (time.time() - stime))
     log.info("Pushing config to router.")
     stime = time.time()
