@@ -32,7 +32,7 @@ def getTags(vgwTags):
   return tags
 
 #This function adds a <transit_vpc_config /> block to an existing XML doc and returns the new XML
-def updateConfigXML(xml, config, vgwTags, account_id, vsrx_number):
+def updateConfigXML(xml, config, vgwTags, account_id, pavm_number):
   xmldoc=minidom.parseString(xml)
   #Create TransitVPC config xml block
   transitConfig= xmldoc.createElement("transit_vpc_config")
@@ -43,7 +43,7 @@ def updateConfigXML(xml, config, vgwTags, account_id, vsrx_number):
 
   #Create VPN Endpoint xml block
   newXml = xmldoc.createElement("vpn_endpoint")
-  newXml.appendChild(xmldoc.createTextNode(vsrx_number))
+  newXml.appendChild(xmldoc.createTextNode(pavm_number))
   transitConfig.appendChild(newXml)
 
   #Create status xml block (create = tagged to create spoke, delete = tagged as spoke, but not with the correct spoke tag value)
@@ -92,7 +92,6 @@ def sendAnonymousData(config, vgwTags, region_id, vpn_connections):
     rspcode = rsp.getcode()
     content = rsp.read()
     log.debug("Response from APIGateway: %s, %s", rspcode, content)
-
 
 def lambda_handler(event, context):
   #Figure out the account number by parsing this function's ARN
@@ -167,17 +166,17 @@ def lambda_handler(event, context):
         vpn1=ec2.create_vpn_connection(Type='ipsec.1',CustomerGatewayId=cg1['CustomerGateway']['CustomerGatewayId'],VpnGatewayId=vgw['VpnGatewayId'],Options={'StaticRoutesOnly':False})
         ec2.create_tags(Resources=[vpn1['VpnConnection']['VpnConnectionId']], 
             Tags=[
-                {'Key': 'Name','Value': vgw['VpnGatewayId']+'-to-Transit-VPC VSRX1' },
+                {'Key': 'Name','Value': vgw['VpnGatewayId']+'-to-Transit-VPC PAVM1' },
                 {'Key': config['HUB_TAG'],'Value': config['HUB_TAG_VALUE'] },
-                {'Key': 'transitvpc:endpoint','Value': 'VSRX1' }
+                {'Key': 'transitvpc:endpoint','Value': 'PAVM1' }
             ])
         #Create and tag second VPN connection
         vpn2=ec2.create_vpn_connection(Type='ipsec.1',CustomerGatewayId=cg2['CustomerGateway']['CustomerGatewayId'],VpnGatewayId=vgw['VpnGatewayId'],Options={'StaticRoutesOnly':False})
         ec2.create_tags(Resources=[vpn2['VpnConnection']['VpnConnectionId']],
                     Tags=[
-                {'Key': 'Name','Value': vgw['VpnGatewayId']+'-to-Transit-VPC VSRX2' },
+                {'Key': 'Name','Value': vgw['VpnGatewayId']+'-to-Transit-VPC PAVM2' },
                 {'Key': config['HUB_TAG'],'Value': config['HUB_TAG_VALUE'] },
-                {'Key': 'transitvpc:endpoint','Value': 'VSRX2' }
+                {'Key': 'transitvpc:endpoint','Value': 'PAVM2' }
             ])
         log.info('Created VPN connections: %s, %s', vpn1['VpnConnection']['VpnConnectionId'], vpn2['VpnConnection']['VpnConnectionId'])
     
@@ -185,12 +184,12 @@ def lambda_handler(event, context):
         vpn_config1=ec2.describe_vpn_connections(VpnConnectionIds=[vpn1['VpnConnection']['VpnConnectionId']])
         vpn_config1=vpn_config1['VpnConnections'][0]['CustomerGatewayConfiguration']
         #Update VPN configuration XML with transit VPC specific configuration info for this connection
-        vpn_config1=updateConfigXML(vpn_config1, config, vgwTags, account_id, 'VSRX1')
-        #Put VSRX1 config in S3
+        vpn_config1=updateConfigXML(vpn_config1, config, vgwTags, account_id, 'PAVM1')
+        #Put PAVM1 config in S3
         s3.put_object(
               Body=str.encode(vpn_config1),
               Bucket=bucket_name,
-              Key=bucket_prefix+'VSRX1/'+region_id+'-'+vpn1['VpnConnection']['VpnConnectionId']+'.conf',
+              Key=bucket_prefix+'PAVM1/'+region_id+'-'+vpn1['VpnConnection']['VpnConnectionId']+'.conf',
               ACL='bucket-owner-full-control',
               ServerSideEncryption='aws:kms',
               SSEKMSKeyId=config['KMS_KEY']
@@ -198,12 +197,12 @@ def lambda_handler(event, context):
         vpn_config2=ec2.describe_vpn_connections(VpnConnectionIds=[vpn2['VpnConnection']['VpnConnectionId']])
         vpn_config2=vpn_config2['VpnConnections'][0]['CustomerGatewayConfiguration']
         #Update VPN configuration XML with transit VPC specific configuration info for this connection
-        vpn_config2=updateConfigXML(vpn_config2, config, vgwTags, account_id, 'VSRX2')
-        #Put VSRX2 config in S3
+        vpn_config2=updateConfigXML(vpn_config2, config, vgwTags, account_id, 'PAVM2')
+        #Put PAVM2 config in S3
         s3.put_object(
           Body=str.encode(vpn_config2),
           Bucket=bucket_name,
-          Key=bucket_prefix+'VSRX2/'+region_id+'-'+vpn2['VpnConnection']['VpnConnectionId']+'.conf',
+          Key=bucket_prefix+'PAVM2/'+region_id+'-'+vpn2['VpnConnection']['VpnConnectionId']+'.conf',
           ACL='bucket-owner-full-control',
           ServerSideEncryption='aws:kms',
           SSEKMSKeyId=config['KMS_KEY']
@@ -220,26 +219,26 @@ def lambda_handler(event, context):
           if vpn['VpnGatewayId']==vgw['VpnGatewayId']:
             #Put the VPN tags into a dict for easier processing
             vpnTags = getTags(vpn['Tags'])
-            if vpnTags['transitvpc:endpoint'] == 'VSRX1':
-              vsrxNum = '1'
+            if vpnTags['transitvpc:endpoint'] == 'PAVM1':
+              pavmNum = '1'
             else:
-              vsrxNum = '2'
-            #Need to get VPN configuration to remove from VSRX
+              pavmNum = '2'
+            #Need to get VPN configuration to remove from PAVM
             vpn_config=vpn['CustomerGatewayConfiguration']
             #Update VPN configuration XML with transit VPC specific configuration info for this connection
             vpn_config=updateConfigXML(vpn_config, config, vgwTags, account_id, vpnTags['transitvpc:endpoint'])
             s3.put_object(
                   Body=str.encode(vpn_config),
                   Bucket=bucket_name,
-                  Key=bucket_prefix+'VSRX'+vsrxNum+'/'+region_id+'-'+vpn['VpnConnectionId']+'.conf',
+                  Key=bucket_prefix+'PAVM'+pavmNum+'/'+region_id+'-'+vpn['VpnConnectionId']+'.conf',
                   ACL='bucket-owner-full-control',
                   ServerSideEncryption='aws:kms',
                   SSEKMSKeyId=config['KMS_KEY']
             )
-            log.debug('Pushed VSRX%s configuration to S3.', vsrxNum)
+            log.debug('Pushed PAVM%s configuration to S3.', pavmNum)
             #now we need to delete the VPN connection
             ec2.delete_vpn_connection(VpnConnectionId=vpn['VpnConnectionId'])
-            log.info('Deleted VPN connection (%s) to VSRX%s', vpn['VpnConnectionId'], vsrxNum)
+            log.info('Deleted VPN connection (%s) to PAVM%s', vpn['VpnConnectionId'], pavmNum)
             #Attempt to clean up the CGW. This will only succeed if the CGW has no VPN connections are deleted
             try:
                 ec2.delete_customer_gateway(CustomerGatewayId=vpn['CustomerGatewayId'])

@@ -63,8 +63,8 @@
     "PAVMType" : {
       "Description" : "Maximum network througput required for PA instances.",
       "Type" : "String",
-      "Default" : "C4.Xlarge",
-      "AllowedValues" : [ "C4.Xlarge" ]
+      "Default" : "c4.2xlarge",
+      "AllowedValues" : [ "c4.2xlarge" ]
     },
     "LicenseModel" : {
       "Description" : "Choose between BYOL (Bring Your Own License) and License Included license models. Remember to first subscribe the the appropriate Marketplace AMI!",
@@ -115,7 +115,7 @@
     {"Fn::Equals" : [
         {"Ref": "AccountId"}, 
         ""
-    ]}
+        ]}
     ]},
    "EnableTerm" : {"Fn::Equals" : [{"Ref" : "TerminationProtection"}, "Yes"]},
    "SendData" : {"Fn::Equals" : [{"Ref" : "SendAnonymousData"}, "Yes"]}
@@ -171,7 +171,7 @@
         "MemorySize": "128"
       },
       "Poller" : { 
-    "CodeLocation" : "PaloAlto-transit-vpc/transit-vpc-poller.py",
+    "CodeLocation" : "paloalto-transit-vpc/transit-vpc-poller.py",
     "Name" : "vgw-poller",
         "Description": "Transit VPC: Poller function responsible for identifying specifically tagged VGWs and creating VPN connections to transit VPC.",
         "Runtime": "python2.7",
@@ -207,7 +207,7 @@
       "us-west-2"      : { "BYOL" : "ami-ca14afaa", "LicenseIncluded" : "ami-9c15aefc" },
     },
     "PAVMInstance" : {
-      "C4.Xlarge"   : { "Type" : "c4.xlarge",   "Bandwidth" : "500000" }
+      "c4.2xlarge"   : { "Type" : "c4.2xlarge",   "Bandwidth" : "500000" }
     }
   },
   "Resources" : {

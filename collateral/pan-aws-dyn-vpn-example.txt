@@ -9,7 +9,7 @@
  edit network ike gateway ike-vpn-1cbd2444-0
   set protocol ikev1 ike-crypto-profile ike-crypto-vpn-1cbd2444-0 exchange-mode main
   set protocol ikev1 dpd interval 10 retry 3 enable yes
-  set authentication pre-shared-key key 2xk0PXeiawyAhlZXEBQWdgOygzL4gMcr
+  set authentication pre-shared-key key <>
   set local-address ip 52.15.228.69
   set local-address interface ethernet1/1
   set peer-address ip 52.8.20.168 

@@ -53,7 +53,6 @@ def prompt(chan):
 def getNextTunnelId(ssh):
     log.info('Start getNextTunnelId')
     output = ''
-    ssh.send('cli\n')
     prompt(ssh)
     ssh.send('show interface logical \n')
     output = prompt(ssh)
@@ -75,38 +74,27 @@ def getNextTunnelId(ssh):
 # Logic to figure out existing tunnel IDs
 def getExistingTunnelId(ssh, vpn_connection_id, tvar):
     log.info('Start getExistingTunnelId')
-    ssh.send('cli\n')
-    prompt(ssh)
     output = ''
-
-    #FIXME
-    cli_command = 'show interface logical\n'.format(vpn_connection_id,tvar)
-    ssh.send(cli_command)
-    #vpn-aws-vpn-
+    prompt(ssh)
+    ssh.send('show interface logical \n')
     output = prompt(ssh)
-    log.info("Output in delete getExistingTunnelId: %s", output)
-    log.debug("%s", output)
-    tunnelNum = 0
 
-    #changes - start
-
+    lastTunnelNum = ''
     for line in output.split('\n'):
-        if 'match bind-interface' not in line:
-            for word in line.split(' '):
-                if 'tunnel' in word:
-                    tunnelNum = int(word.replace('tunnel.',''))
+        log.info('line: %s',line)
+        if line.strip()[:7] == 'tunnel.':
+            log.info("%s", line)
+            lastTunnelNum = line.strip().partition(' ')[0].replace('tunnel.','')
 
-    if tunnelNum < 0:
+    ssh.send('exit\n')
+
+    if lastTunnelNum == '':
         return 0
     else:
-        return tunnelNum
+        return int(lastTunnelNum)
 
 #Generic logic to push pre-generated config to the router
 def pushConfig(ssh, config):
-    #log.info("Starting to push config")
-    #ssh.send('term len 0\n')
-    #prompt(ssh)
-    #CISCO --ssh.send('config t\n')
     ssh.send('configure\n')
     log.debug("%s", prompt(ssh))
     stime = time.time()
@@ -118,21 +106,21 @@ def pushConfig(ssh, config):
             ssh.send(line+'\n')
             log.info("%s", prompt(ssh))
     
-    log.info("Saving config!")
-    #ssh.send('save /var/log/AWS_config.txt\n\n\n\n\n')
-    log.info("Saved config!")
+    log.info("Saving backup config...")
+    ssh.send('save config to AWS_config.txt\n\n\n\n\n')
+    log.info("Backup configuration saved")
     time.sleep(15)
-    #log.info("%s", prompt(ssh))
-    log.info("Committing---")
+
+    log.info("Committing Configuration...")
     ssh.send('commit\n')
     time.sleep(30)
     ssh.send('exit\n')
-    #log.info("%s", prompt(ssh))
-    log.debug("   --- %s seconds ---", (time.time() - stime))
-    ##ssh.send('copy run start\n\n\n\n\n')
+
+    log.debug("   ... %s seconds ...", (time.time() - stime))
+
     ssh.send('exit\n')
-    #log.info("%s", prompt(ssh))
-    log.info("Update complete!")
+
+    log.info("Config Update complete!")
 
 #Logic to determine the bucket prefix from the S3 key name that was provided
 def getBucketPrefix(bucket_name, bucket_key):

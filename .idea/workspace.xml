@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="f82d78f8-4571-40ef-89ae-662d72e0a72c" name="Default" comment="">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/transit-vpc-push-paloalto-config.py" afterPath="$PROJECT_DIR$/transit-vpc-push-paloalto-config.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -20,12 +21,10 @@
       <file leaf-file-name="transit-vpc-push-paloalto-config.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/transit-vpc-push-paloalto-config.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="3816">
-              <caret line="423" column="50" lean-forward="false" selection-start-line="423" selection-start-column="50" selection-end-line="423" selection-end-column="50" />
+            <state relative-caret-position="354">
+              <caret line="418" column="57" lean-forward="true" selection-start-line="418" selection-start-column="57" selection-end-line="418" selection-end-column="57" />
               <folding>
-                <element signature="e#2900#3424#0" expanded="false" />
-                <element signature="e#3525#4271#0" expanded="false" />
-                <element signature="e#6758#7136#0" expanded="false" />
+                <element signature="e#6768#7146#0" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -36,7 +35,11 @@
   <component name="FindInProjectRecents">
     <findStrings>
       <find>7224</find>
+      <find>VSRX</find>
     </findStrings>
+    <replaceStrings>
+      <replace>PAVM</replace>
+    </replaceStrings>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -61,7 +64,7 @@
     <ConfirmationsSetting value="1" id="Add" />
   </component>
   <component name="ProjectView">
-    <navigator currentView="ProjectPane" proportions="" version="1">
+    <navigator proportions="" version="1">
       <flattenPackages />
       <showMembers />
       <showModules />
@@ -74,25 +77,7 @@
       <manualOrder />
       <foldersAlwaysOnTop value="true" />
     </navigator>
-    <panes>
-      <pane id="PackagesPane" />
-      <pane id="ProjectPane">
-        <subPane>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="aws-paloalto-transit-vpc" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="aws-paloalto-transit-vpc" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-        </subPane>
-      </pane>
-      <pane id="Scope" />
-      <pane id="Scratches" />
-    </panes>
+    <panes />
   </component>
   <component name="PropertiesComponent">
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
@@ -501,36 +486,40 @@
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/transit-vpc-push-paloalto-config.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding>
-            <element signature="e#2900#3424#0" expanded="false" />
-            <element signature="e#3525#4271#0" expanded="false" />
-            <element signature="e#6758#7136#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/transit-vpc-push-paloalto-config.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding>
-            <element signature="e#2900#3424#0" expanded="false" />
-            <element signature="e#3525#4271#0" expanded="false" />
-            <element signature="e#6758#7136#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/transit-vpc-push-paloalto-config.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3816">
+        <state relative-caret-position="5460">
           <caret line="423" column="50" lean-forward="false" selection-start-line="423" selection-start-column="50" selection-end-line="423" selection-end-column="50" />
           <folding>
-            <element signature="e#2900#3424#0" expanded="false" />
-            <element signature="e#3525#4271#0" expanded="false" />
-            <element signature="e#6758#7136#0" expanded="false" />
+            <element signature="e#6768#7146#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/transit-vpc-push-paloalto-config.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="e#6768#7146#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/transit-vpc-push-paloalto-config.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="e#6768#7146#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/transit-vpc-push-paloalto-config.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="354">
+          <caret line="418" column="57" lean-forward="true" selection-start-line="418" selection-start-column="57" selection-end-line="418" selection-end-column="57" />
+          <folding>
+            <element signature="e#6768#7146#0" expanded="false" />
           </folding>
         </state>
       </provider>
