@@ -1,101 +1,107 @@
 {
-  "AWSTemplateFormatVersion" : "2010-09-09",
-
-  "Description" : "(SO0001j) - Transit VPC: This template creates a dedicated transit VPC with Palo Alto for routing traffic. ***NOTE*** You must first subscribe to the appropriate Palo Alto marketplace BYOL or License Included AMI from the AWS Marketplace before you launch this template.",
-
-  "Parameters" : {
-    "KeyName" : {
-      "Description" : "Name of an existing EC2 KeyPair to enable SSH access to the instances",
-      "Type" : "AWS::EC2::KeyPair::KeyName",
-      "Default" : "Lab"
+  "AWSTemplateFormatVersion":"2010-09-09",
+  "Description":"(SO0001j) - Transit VPC: This template creates a dedicated transit VPC with Palo Alto for routing traffic. ***NOTE*** You must first subscribe to the appropriate Palo Alto marketplace BYOL or License Included AMI from the AWS Marketplace before you launch this template.",
+  "Parameters":{
+    "KeyName":{
+      "Description":"Name of an existing EC2 KeyPair to enable SSH access to the instances",
+      "Type":"AWS::EC2::KeyPair::KeyName",
+      "Default":"Lab"
     },
-    "TerminationProtection" : {
-      "Description" : "Enable termination protection on the PAVM EC2 instances to avoid accidential PAVM termination?",
-      "Type" : "String",
-      "Default" : "Yes",
-      "AllowedValues" : ["Yes", "No"]
+    "TerminationProtection":{
+      "Description":"Enable termination protection on the PAVM EC2 instances to avoid accidential PAVM termination?",
+      "Type":"String",
+      "Default":"Yes",
+      "AllowedValues":[
+        "Yes",
+        "No"
+      ]
     },
-    "PreferredPathTag" : {
-      "Description" : "Tag to use to configure a preferred PA VPN endpoint to control traffic flow through the Transit VPC (e.g. when integrating with CPE).",
-      "Type" : "String",
-      "Default" : "transitvpc:preferred-path"
+    "PreferredPathTag":{
+      "Description":"Tag to use to configure a preferred PA VPN endpoint to control traffic flow through the Transit VPC (e.g. when integrating with CPE).",
+      "Type":"String",
+      "Default":"transitvpc:preferred-path"
     },
-    "SpokeTag" : {
-      "Description" : "Tag to use to identify spoke VPCs to connect to Transit VPC.",
-      "Type" : "String",
-      "Default" : "transitvpc:spoke"
+    "SpokeTag":{
+      "Description":"Tag to use to identify spoke VPCs to connect to Transit VPC.",
+      "Type":"String",
+      "Default":"transitvpc:spoke"
     },
-    "SpokeTagValue" : {
-      "Description" : "Tag value to use to identify spoke VPCs to connect to Transit VPC.",
-      "Type" : "String",
-      "Default" : "true"
+    "SpokeTagValue":{
+      "Description":"Tag value to use to identify spoke VPCs to connect to Transit VPC.",
+      "Type":"String",
+      "Default":"true"
     },
-    "BgpAsn" : {
-      "Description" : "BGP ASN to use for Transit VPC.",
-      "Type" : "String",
-      "Default" : "64512"
+    "BgpAsn":{
+      "Description":"BGP ASN to use for Transit VPC.",
+      "Type":"String",
+      "Default":"64512"
     },
-    "VpcCidr" : {
-      "Description" : "CIDR block for Transit VPC.",
-      "Type" : "String",
-      "Default" : "200.0.0.0/16"
+    "VpcCidr":{
+      "Description":"CIDR block for Transit VPC.",
+      "Type":"String",
+      "Default":"200.0.0.0/16"
     },
-    "PubSubnet11" : {
-      "Description" : "Address range for Transit VPC subnet to be created in AZ1.",
-      "Type" : "String",
-      "Default" : "200.0.254.0/24"
+    "PubSubnet11":{
+      "Description":"Address range for Transit VPC subnet to be created in AZ1.",
+      "Type":"String",
+      "Default":"200.0.254.0/24"
     },
-    "PubSubnet12" : {
-      "Description" : "Address range for Transit VPC subnet to be created in AZ1.",
-      "Type" : "String",
-      "Default" : "200.0.1.0/24"
+    "PubSubnet12":{
+      "Description":"Address range for Transit VPC subnet to be created in AZ1.",
+      "Type":"String",
+      "Default":"200.0.1.0/24"
     },
-    "PubSubnet21" : {
-      "Description" : "Address range for Transit VPC subnet to be created in AZ2.",
-      "Type" : "String",
-      "Default" : "200.0.253.0/24"
+    "PubSubnet21":{
+      "Description":"Address range for Transit VPC subnet to be created in AZ2.",
+      "Type":"String",
+      "Default":"200.0.253.0/24"
     },
-    "PubSubnet22" : {
-      "Description" : "Address range for Transit VPC subnet to be created in AZ2.",
-      "Type" : "String",
-      "Default" : "200.0.2.0/24"
+    "PubSubnet22":{
+      "Description":"Address range for Transit VPC subnet to be created in AZ2.",
+      "Type":"String",
+      "Default":"200.0.2.0/24"
     },
-    "PAVMType" : {
-      "Description" : "Maximum network througput required for PA instances.",
-      "Type" : "String",
-      "Default" : "c4.2xlarge",
-      "AllowedValues" : [ "c4.2xlarge" ]
+    "PAVMType":{
+      "Description":"Maximum network througput required for PA instances.",
+      "Type":"String",
+      "Default":"c4.2xlarge",
+      "AllowedValues":[
+        "c4.2xlarge"
+      ]
     },
-    "LicenseModel" : {
-      "Description" : "Choose between BYOL (Bring Your Own License) and License Included license models. Remember to first subscribe the the appropriate Marketplace AMI!",
-      "Type" : "String",
-      "Default" : "LicenseIncluded",
-      "AllowedValues" : ["LicenseIncluded", "BYOL"]
+    "LicenseModel":{
+      "Description":"Choose between BYOL (Bring Your Own License) and License Included license models. Remember to first subscribe the the appropriate Marketplace AMI!",
+      "Type":"String",
+      "Default":"LicenseIncluded",
+      "AllowedValues":[
+        "LicenseIncluded",
+        "BYOL"
+      ]
     },
-    "S3Prefix" : {
-      "Description" : "S3 prefix to append before S3 key names.",
-      "Type" : "String",
-      "Default" : "vpnconfigs/"
+    "S3Prefix":{
+      "Description":"S3 prefix to append before S3 key names.",
+      "Type":"String",
+      "Default":"vpnconfigs/"
     },
-    "AccountId" : {
-      "Description" : "Another AWS Account ID to authorize access to VPN Config S3 bucket (for example bucket and KMS key policies).",
-      "Type" : "String",
-      "Default" : ""
+    "AccountId":{
+      "Description":"Another AWS Account ID to authorize access to VPN Config S3 bucket (for example bucket and KMS key policies).",
+      "Type":"String",
+      "Default":""
     },
-    "SendAnonymousData": {
-        "Description": "Choose to send anonymous data to AWS.",
-        "Type": "String",
-        "Default": "No",
-        "AllowedValues": [
-            "Yes",
-            "No"
-        ]
+    "SendAnonymousData":{
+      "Description":"Choose to send anonymous data to AWS.",
+      "Type":"String",
+      "Default":"No",
+      "AllowedValues":[
+        "Yes",
+        "No"
+      ]
     },
-    "LambdaRegion": {
-      "Description": "Choose a region to where Lambda code runs.",
-      "Type": "String",
-      "Default": "us-east-1",
-      "AllowedValues": [ 
+    "LambdaRegion":{
+      "Description":"Choose a region to where Lambda code runs.",
+      "Type":"String",
+      "Default":"us-east-1",
+      "AllowedValues":[
         "us-east-1",
         "us-east-2",
         "us-west-2",
@@ -107,922 +113,2126 @@
         "ap-southeast-2",
         "ap-northeast-1",
         "ap-northeast-2"
-      ]  
+      ]
     }
   },
-  "Conditions" : {
-    "AuthorizeAnotherAccount" : {"Fn::Not" : [
-    {"Fn::Equals" : [
-        {"Ref": "AccountId"}, 
-        ""
-        ]}
-    ]},
-   "EnableTerm" : {"Fn::Equals" : [{"Ref" : "TerminationProtection"}, "Yes"]},
-   "SendData" : {"Fn::Equals" : [{"Ref" : "SendAnonymousData"}, "Yes"]}
-  },
-  "Metadata" : {
-    "AWS::CloudFormation::Interface" : {
-     "ParameterGroups" : [
-      {
-        "Label" : { "default":"PA VM Configuration" },
-        "Parameters" : [ "PAVMType", "KeyName", "LicenseModel", "TerminationProtection" ]
-      },
-      {
-        "Label" : { "default":"AWS Service Configuration" },
-        "Parameters" : [ "S3Prefix", "AccountId", "LambdaRegion" ]
-      },
-      {
-        "Label" : { "default" : "Network Configuration" },
-        "Parameters" : [ "VpcCidr", "PubSubnet11", "PubSubnet12", "PubSubnet21","PubSubnet22", "BgpAsn","SpokeTag","SpokeTagValue","PreferredPathTag" ]
-      },
-      {
-        "Label": { "default": "Anonymous Metrics Request" },
-        "Parameters": [ "SendAnonymousData" ]
-      }
-     ],
-     "ParameterLabels" : {
-      "BgpAsn" : { "default" : "Transit VPC BGP ASN" },
-      "SpokeTag" : { "default" : "Spoke VPC Tag Name" },
-      "SpokeTagValue" : { "default" : "Spoke VPC Tag Value" },
-      "PreferredPathTag" : { "default" : "Preferred VPN Endpoint Tag Name" },
-      "VpcCidr" : { "default" : "Transit VPC CIDR Block" },
-      "PubSubnet11" : { "default" : "PAVM1- 1st Subnet Network" },
-      "PubSubnet12" : { "default" : "PAVM1- 2nd Subnet Network" },
-      "PubSubnet21" : { "default" : "PAVM2- 1st Subnet Network" },
-      "PubSubnet22" : { "default" : "PAVM2- 2nd Subnet Network" },
-      "PAVMType" : { "default" : "PAVM Throughput Requirements" },
-      "KeyName" : { "default" : "SSH Key to access PAVM" },
-      "S3Prefix" : { "default" : "Prefix for S3 Objects" },
-      "LicenseModel" : { "default" : "License Model" },
-      "TerminationProtection" : { "default" : "Enable Termination Protection" },
-      "AccountId" : { "default" : "Additional AWS Account ID (Optional)" },
-      "LambdaRegion" : {"default": "Lambda region"}
-     }
+  "Conditions":{
+    "AuthorizeAnotherAccount":{
+      "Fn::Not":[
+        {
+          "Fn::Equals":[
+            {
+              "Ref":"AccountId"
+            },
+            ""
+          ]
+        }
+      ]
+    },
+    "EnableTerm":{
+      "Fn::Equals":[
+        {
+          "Ref":"TerminationProtection"
+        },
+        "Yes"
+      ]
+    },
+    "SendData":{
+      "Fn::Equals":[
+        {
+          "Ref":"SendAnonymousData"
+        },
+        "Yes"
+      ]
     }
   },
-  "Mappings" : {
-    "Function" : {
-      "Configurator" : { 
-    "CodeLocation" : "paloalto-transit-vpc/transit-vpc-push-paloalto-config.zip",
-      "Name" : "paloalto-configurator",
-        "Description": "Transit VPC: This function is invoked when a generic VPN configuration is placed in an S3 bucket - it converts the generic information into PAN OS specific commands and pushes the config to transit VPC routers.",
-        "Runtime": "python2.7",
-        "Timeout": "300",
-        "MemorySize": "128"
-      },
-      "Poller" : { 
-    "CodeLocation" : "paloalto-transit-vpc/transit-vpc-poller.py",
-    "Name" : "vgw-poller",
-        "Description": "Transit VPC: Poller function responsible for identifying specifically tagged VGWs and creating VPN connections to transit VPC.",
-        "Runtime": "python2.7",
-        "Timeout": "120",
-        "MemorySize": "128"
-      },
-      "FindReplace" : {
-    "S3BucketID" : "%BUCKET_NAME%",
-    "S3PrefixID" : "%PREFIX%",
-    "Deliminator" : "|"
-      },
-      "PAVM" : {
-    "UserName" : "root",
-    "PasswordLength" : "15",
-    "PrivateKey" : "prikey.pem",
-    "PublicKey" : "pubkey.pem"
-      }
-    },
-    "PaloAltoPAVMAMI" : {
-      "ap-south-1"     : { "BYOL" : "ami-0268196d", "LicenseIncluded" : "ami-0368196c" },
-      "eu-west-2"      : { "BYOL" : "ami-a74e5bc3", "LicenseIncluded" : "ami-5c4f5a38" },
-      "eu-west-1"      : { "BYOL" : "ami-32fca754", "LicenseIncluded" : "ami-abffa4cd" },
-      "ap-northeast-2" : { "BYOL" : "ami-925e8ffc", "LicenseIncluded" : "ami-19409177" },
-      "ap-northeast-1" : { "BYOL" : "ami-a8bef8cf", "LicenseIncluded" : "ami-56bff931" },
-      "sa-east-1"      : { "BYOL" : "ami-feb6d292", "LicenseIncluded" : "ami-20b5d14c" },
-      "us-central-1"   : { "BYOL" : "ami-c4c37ea0", "LicenseIncluded" : "ami-ebc17c8f" },
-      "ap-southeast-1" : { "BYOL" : "ami-55bb0f36", "LicenseIncluded" : "ami-a5bb0fc6" },
-      "ap-southeast-2" : { "BYOL" : "ami-2f3e384c", "LicenseIncluded" : "ami-cc3335af" },
-      "eu-central-1"   : { "BYOL" : "ami-bb3af3d4", "LicenseIncluded" : "ami-e43df48b" },
-      "us-east-1"      : { "BYOL" : "ami-f22cd7e4", "LicenseIncluded" : "ami-4222d954" },
-      "us-east-2"      : { "BYOL" : "ami-360c2953", "LicenseIncluded" : "ami-0e0d286b" },
-      "us-west-1"      : { "BYOL" : "ami-a1a5f8c1", "LicenseIncluded" : "ami-59a3fe39" },
-      "us-west-2"      : { "BYOL" : "ami-ca14afaa", "LicenseIncluded" : "ami-9c15aefc" },
-    },
-    "PAVMInstance" : {
-      "c4.2xlarge"   : { "Type" : "c4.2xlarge",   "Bandwidth" : "500000" }
-    }
-  },
-  "Resources" : {
-    "VPNConfigS3Bucket" : {
-      "Type" : "AWS::S3::Bucket"
-    },
-    "VPNConfigBucketPolicy" : {
-      "Type" : "AWS::S3::BucketPolicy",
-      "Properties" : {
-        "Bucket" : {"Ref" : "VPNConfigS3Bucket" },
-        "PolicyDocument": {
-          "Statement":[ {
-        "Sid": "DenyUnEncryptedObjectUploads",
-        "Effect": "Deny",
-        "Principal": "*",
-        "Action": "s3:PutObject",
-        "Resource": { "Fn::Join" : ["", ["arn:aws:s3:::", { "Ref" : "VPNConfigS3Bucket" },"/",{ "Ref" : "S3Prefix" }, "*" ]]},
-        "Condition": {
-        "StringNotEquals": {
-          "s3:x-amz-server-side-encryption": "aws:kms"
-        }
-        }
-      },
-      {
-        "Action":["s3:GetObject", "s3:PutObject", "s3:PutObjectAcl"],
-        "Effect":"Allow",
-        "Resource": { "Fn::Join" : ["", ["arn:aws:s3:::", { "Ref" : "VPNConfigS3Bucket" },"/",{ "Ref" : "S3Prefix" }, "*" ]]},
-        "Principal": {
-        "AWS" : [{ "Fn::Join" : ["", ["arn:aws:iam::",{"Fn::If": ["AuthorizeAnotherAccount", {"Ref" : "AccountId" }, { "Ref" : "AWS::AccountId" } ]}, ":root" ]]}]
-        }
-      }]
-        }
-      }
-    },
-    "KMSKey" : {
-      "Type" : "AWS::KMS::Key",
-      "Properties" : {
-        "Description" : "TransitVPC CMK for S3 SSE-KMS",
-        "KeyPolicy" : {
-          "Version": "2012-10-17",
-          "Id": "transit-vpc-1",
-          "Statement": [ {
-            "Sid": "Enable IAM User Permissions",
-            "Effect": "Allow",
-            "Principal": { "AWS": [
-        { "Fn::Join" : ["", ["arn:aws:iam::",{ "Ref" : "AWS::AccountId" }, ":root" ]]}
-        ] },
-            "Action": [
-              "kms:*"
-            ], 
-            "Resource": "*"
+  "Metadata":{
+    "AWS::CloudFormation::Interface":{
+      "ParameterGroups":[
+        {
+          "Label":{
+            "default":"PA VM Configuration"
           },
-      {
-            "Sid": "Allow use of the key",
-            "Effect": "Allow",
-            "Principal": { "AWS": [
-        { "Fn::Join" : ["", ["arn:aws:iam::",{"Fn::If": ["AuthorizeAnotherAccount", {"Ref" : "AccountId" }, { "Ref" : "AWS::AccountId" } ]}, ":root" ]]},
-        { "Fn::GetAtt" : ["SolutionHelperRole", "Arn"] },
-        { "Fn::GetAtt" : ["PaloAltoConfigFunctionRole", "Arn"] },
-        { "Fn::GetAtt" : ["TransitVpcPollerRole", "Arn"] }
-        ] },
-            "Action": [
-              "kms:Encrypt",
-              "kms:Decrypt",
-              "kms:ReEncrypt*",
-              "kms:GenerateDataKey*",
-              "kms:DescribeKey"
-            ], 
-            "Resource": "*"
-          } ]
+          "Parameters":[
+            "PAVMType",
+            "KeyName",
+            "LicenseModel",
+            "TerminationProtection"
+          ]
+        },
+        {
+          "Label":{
+            "default":"AWS Service Configuration"
+          },
+          "Parameters":[
+            "S3Prefix",
+            "AccountId",
+            "LambdaRegion"
+          ]
+        },
+        {
+          "Label":{
+            "default":"Network Configuration"
+          },
+          "Parameters":[
+            "VpcCidr",
+            "PubSubnet11",
+            "PubSubnet12",
+            "PubSubnet21",
+            "PubSubnet22",
+            "BgpAsn",
+            "SpokeTag",
+            "SpokeTagValue",
+            "PreferredPathTag"
+          ]
+        },
+        {
+          "Label":{
+            "default":"Anonymous Metrics Request"
+          },
+          "Parameters":[
+            "SendAnonymousData"
+          ]
+        }
+      ],
+      "ParameterLabels":{
+        "BgpAsn":{
+          "default":"Transit VPC BGP ASN"
+        },
+        "SpokeTag":{
+          "default":"Spoke VPC Tag Name"
+        },
+        "SpokeTagValue":{
+          "default":"Spoke VPC Tag Value"
+        },
+        "PreferredPathTag":{
+          "default":"Preferred VPN Endpoint Tag Name"
+        },
+        "VpcCidr":{
+          "default":"Transit VPC CIDR Block"
+        },
+        "PubSubnet11":{
+          "default":"PAVM1- 1st Subnet Network"
+        },
+        "PubSubnet12":{
+          "default":"PAVM1- 2nd Subnet Network"
+        },
+        "PubSubnet21":{
+          "default":"PAVM2- 1st Subnet Network"
+        },
+        "PubSubnet22":{
+          "default":"PAVM2- 2nd Subnet Network"
+        },
+        "PAVMType":{
+          "default":"PAVM Throughput Requirements"
+        },
+        "KeyName":{
+          "default":"SSH Key to access PAVM"
+        },
+        "S3Prefix":{
+          "default":"Prefix for S3 Objects"
+        },
+        "LicenseModel":{
+          "default":"License Model"
+        },
+        "TerminationProtection":{
+          "default":"Enable Termination Protection"
+        },
+        "AccountId":{
+          "default":"Additional AWS Account ID (Optional)"
+        },
+        "LambdaRegion":{
+          "default":"Lambda region"
+        }
+      }
+    }
+  },
+  "Mappings":{
+    "Function":{
+      "Configurator":{
+        "CodeLocation":"paloalto-transit-vpc/transit-vpc-push-paloalto-config.zip",
+        "Name":"paloalto-configurator",
+        "Description":"Transit VPC: This function is invoked when a generic VPN configuration is placed in an S3 bucket - it converts the generic information into PAN OS specific commands and pushes the config to transit VPC routers.",
+        "Runtime":"python2.7",
+        "Timeout":"300",
+        "MemorySize":"128"
+      },
+      "Poller":{
+        "CodeLocation":"paloalto-transit-vpc/transit-vpc-poller.py",
+        "Name":"vgw-poller",
+        "Description":"Transit VPC: Poller function responsible for identifying specifically tagged VGWs and creating VPN connections to transit VPC.",
+        "Runtime":"python2.7",
+        "Timeout":"120",
+        "MemorySize":"128"
+      },
+      "FindReplace":{
+        "S3BucketID":"%BUCKET_NAME%",
+        "S3PrefixID":"%PREFIX%",
+        "Deliminator":"|"
+      },
+      "PAVM":{
+        "UserName":"root",
+        "PasswordLength":"15",
+        "PrivateKey":"prikey.pem",
+        "PublicKey":"pubkey.pem"
+      }
+    },
+    "PaloAltoPAVMAMI":{
+      "ap-south-1":{
+        "BYOL":"ami-0268196d",
+        "LicenseIncluded":"ami-0368196c"
+      },
+      "eu-west-2":{
+        "BYOL":"ami-a74e5bc3",
+        "LicenseIncluded":"ami-5c4f5a38"
+      },
+      "eu-west-1":{
+        "BYOL":"ami-32fca754",
+        "LicenseIncluded":"ami-abffa4cd"
+      },
+      "ap-northeast-2":{
+        "BYOL":"ami-925e8ffc",
+        "LicenseIncluded":"ami-19409177"
+      },
+      "ap-northeast-1":{
+        "BYOL":"ami-a8bef8cf",
+        "LicenseIncluded":"ami-56bff931"
+      },
+      "sa-east-1":{
+        "BYOL":"ami-feb6d292",
+        "LicenseIncluded":"ami-20b5d14c"
+      },
+      "us-central-1":{
+        "BYOL":"ami-c4c37ea0",
+        "LicenseIncluded":"ami-ebc17c8f"
+      },
+      "ap-southeast-1":{
+        "BYOL":"ami-55bb0f36",
+        "LicenseIncluded":"ami-a5bb0fc6"
+      },
+      "ap-southeast-2":{
+        "BYOL":"ami-2f3e384c",
+        "LicenseIncluded":"ami-cc3335af"
+      },
+      "eu-central-1":{
+        "BYOL":"ami-bb3af3d4",
+        "LicenseIncluded":"ami-e43df48b"
+      },
+      "us-east-1":{
+        "BYOL":"ami-f22cd7e4",
+        "LicenseIncluded":"ami-4222d954"
+      },
+      "us-east-2":{
+        "BYOL":"ami-360c2953",
+        "LicenseIncluded":"ami-0e0d286b"
+      },
+      "us-west-1":{
+        "BYOL":"ami-a1a5f8c1",
+        "LicenseIncluded":"ami-59a3fe39"
+      },
+      "us-west-2":{
+        "BYOL":"ami-ca14afaa",
+        "LicenseIncluded":"ami-9c15aefc"
+      }
+    },
+    "PAVMInstance":{
+      "c4.2xlarge":{
+        "Type":"c4.2xlarge",
+        "Bandwidth":"500000"
+      }
+    }
+  },
+  "Resources":{
+    "VPNConfigS3Bucket":{
+      "Type":"AWS::S3::Bucket"
+    },
+    "VPNConfigBucketPolicy":{
+      "Type":"AWS::S3::BucketPolicy",
+      "Properties":{
+        "Bucket":{
+          "Ref":"VPNConfigS3Bucket"
+        },
+        "PolicyDocument":{
+          "Statement":[
+            {
+              "Sid":"DenyUnEncryptedObjectUploads",
+              "Effect":"Deny",
+              "Principal":"*",
+              "Action":"s3:PutObject",
+              "Resource":{
+                "Fn::Join":[
+                  "",
+                  [
+                    "arn:aws:s3:::",
+                    {
+                      "Ref":"VPNConfigS3Bucket"
+                    },
+                    "/",
+                    {
+                      "Ref":"S3Prefix"
+                    },
+                    "*"
+                  ]
+                ]
+              },
+              "Condition":{
+                "StringNotEquals":{
+                  "s3:x-amz-server-side-encryption":"aws:kms"
+                }
+              }
+            },
+            {
+              "Action":[
+                "s3:GetObject",
+                "s3:PutObject",
+                "s3:PutObjectAcl"
+              ],
+              "Effect":"Allow",
+              "Resource":{
+                "Fn::Join":[
+                  "",
+                  [
+                    "arn:aws:s3:::",
+                    {
+                      "Ref":"VPNConfigS3Bucket"
+                    },
+                    "/",
+                    {
+                      "Ref":"S3Prefix"
+                    },
+                    "*"
+                  ]
+                ]
+              },
+              "Principal":{
+                "AWS":[
+                  {
+                    "Fn::Join":[
+                      "",
+                      [
+                        "arn:aws:iam::",
+                        {
+                          "Fn::If":[
+                            "AuthorizeAnotherAccount",
+                            {
+                              "Ref":"AccountId"
+                            },
+                            {
+                              "Ref":"AWS::AccountId"
+                            }
+                          ]
+                        },
+                        ":root"
+                      ]
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
         }
       }
     },
-    "TransitVPC" : {
-      "Type" : "AWS::EC2::VPC",
-      "Properties" : {
-        "CidrBlock" : { "Ref" : "VpcCidr" },
-        "Tags" : [
-          { "Key" : "Name", "Value" : "Transit VPC" }
-        ]
-      }
-    },
-    "VPCPubSub11" : {
-      "Type" : "AWS::EC2::Subnet",
-      "Properties" : {
-        "VpcId" : { "Ref" : "TransitVPC" },
-        "CidrBlock" : { "Ref" : "PubSubnet11" },
-        "AvailabilityZone" : { "Fn::Select": ["0", {"Fn::GetAZs": ""}] },
-        "Tags" : [
-          { "Key" : "Network", "Value" : "Public" },
-          { "Key" : "Name", "Value" : "Transit VPC Subnet1" }
-        ]
-      }
-    },
-    "VPCPubSub12" : {
-      "Type" : "AWS::EC2::Subnet",
-      "Properties" : {
-        "VpcId" : { "Ref" : "TransitVPC" },
-        "CidrBlock" : { "Ref" : "PubSubnet12" },
-        "AvailabilityZone" : { "Fn::Select": ["0", {"Fn::GetAZs": ""}] },
-        "Tags" : [
-          { "Key" : "Network", "Value" : "Public" },
-          { "Key" : "Name", "Value" : "Transit VPC Subnet1" }
-        ]
-      }
-    },
-    "VPCPubSub21" : {
-      "Type" : "AWS::EC2::Subnet",
-      "Properties" : {
-        "VpcId" : { "Ref" : "TransitVPC" },
-        "CidrBlock" : { "Ref" : "PubSubnet21" },
-        "AvailabilityZone" : { "Fn::Select": ["1", {"Fn::GetAZs": ""}] },
-        "Tags" : [
-          { "Key" : "Network", "Value" : "Public" },
-          { "Key" : "Name", "Value" : "Transit VPC Subnet2" }
-        ]
-      }
-    },
-    "VPCPubSub22" : {
-      "Type" : "AWS::EC2::Subnet",
-      "Properties" : {
-        "VpcId" : { "Ref" : "TransitVPC" },
-        "CidrBlock" : { "Ref" : "PubSubnet22" },
-        "AvailabilityZone" : { "Fn::Select": ["1", {"Fn::GetAZs": ""}] },
-        "Tags" : [
-          { "Key" : "Network", "Value" : "Public" },
-          { "Key" : "Name", "Value" : "Transit VPC Subnet1" }
-        ]
-      }
-    },
-    "IGW" : {
-      "Type" : "AWS::EC2::InternetGateway",
-      "Properties" : {
-        "Tags" : [
-          { "Key" : "Name", "Value" : "Transit VPC IGW" }
-        ]
-      }
-    },
-    "IGWToInternet" : {
-       "Type" : "AWS::EC2::VPCGatewayAttachment",
-       "Properties" : {
-         "VpcId" : { "Ref" : "TransitVPC" },
-         "InternetGatewayId" : { "Ref" : "IGW" }
-       }
-    },
-    "VPCRouteTable" : {
-      "Type" : "AWS::EC2::RouteTable",
-      "Properties" : {
-        "VpcId" : { "Ref" : "TransitVPC" },
-        "Tags" : [
-          { "Key" : "Network", "Value" : "Public" },
-          { "Key" : "Name", "Value" : "Transit VPC" }
-        ]
-      }
-    },
-    "VPCPublicRoute" : {
-      "Type" : "AWS::EC2::Route",
-      "Properties" : {
-        "RouteTableId" : { "Ref" : "VPCRouteTable" },
-        "DestinationCidrBlock" : "0.0.0.0/0",
-        "GatewayId" : { "Ref" : "IGW" }
-      }
-    },
-    "S3Endpoint" : {
-      "Type" : "AWS::EC2::VPCEndpoint",
-      "Properties" : {
-        "PolicyDocument" : {
+    "KMSKey":{
+      "Type":"AWS::KMS::Key",
+      "Properties":{
+        "Description":"TransitVPC CMK for S3 SSE-KMS",
+        "KeyPolicy":{
           "Version":"2012-10-17",
-          "Statement":[{
-            "Effect":"Allow",
-            "Principal": "*",
-            "Action":["s3:*"],
-            "Resource":["*"]
-          }]
-        },
-        "RouteTableIds" : [ {"Ref" : "VPCRouteTable"} ],
-        "ServiceName" : { "Fn::Join": [ "", [ "com.amazonaws.", { "Ref": "AWS::Region" }, ".s3" ] ] },
-        "VpcId" : {"Ref" : "TransitVPC"}
-      }
-    },
-    "VPCPubSubnetRouteTableAssociation1" : {
-      "Type" : "AWS::EC2::SubnetRouteTableAssociation",
-      "Properties" : {
-        "SubnetId" : { "Ref" : "VPCPubSub11" },
-        "RouteTableId" : { "Ref" : "VPCRouteTable" }
-      }
-    },
-    "VPCPubSubnetRouteTableAssociation2" : {
-      "Type" : "AWS::EC2::SubnetRouteTableAssociation",
-      "Properties" : {
-        "SubnetId" : { "Ref" : "VPCPubSub12" },
-        "RouteTableId" : { "Ref" : "VPCRouteTable" }
-      }
-    },
-    "VPCPubSubnetRouteTableAssociation3" : {
-      "Type" : "AWS::EC2::SubnetRouteTableAssociation",
-      "Properties" : {
-        "SubnetId" : { "Ref" : "VPCPubSub21" },
-        "RouteTableId" : { "Ref" : "VPCRouteTable" }
-      }
-    },
-    "VPCPubSubnetRouteTableAssociation4" : {
-      "Type" : "AWS::EC2::SubnetRouteTableAssociation",
-      "Properties" : {
-        "SubnetId" : { "Ref" : "VPCPubSub22" },
-        "RouteTableId" : { "Ref" : "VPCRouteTable" }
-      }
-    },
-    "PAVMEip11" : {
-      "Type" : "AWS::EC2::EIP",
-      "Properties" : {
-        "Domain" : "vpc"
-      }
-    },
-    "PAVMEip12" : {
-      "Type" : "AWS::EC2::EIP",
-      "Properties" : {
-        "Domain" : "vpc"
-      }
-    },
-    "PAVMEip21" : {
-      "Type" : "AWS::EC2::EIP",
-      "Properties" : {
-        "Domain" : "vpc"
-      }
-    },
-    "PAVMEip22" : {
-      "Type" : "AWS::EC2::EIP",
-      "Properties" : {
-        "Domain" : "vpc"
-      }
-    },
-    "AssociateEIP11" : {
-      "Type" : "AWS::EC2::EIPAssociation",
-      "Properties" : {
-        "AllocationId" : { "Fn::GetAtt" : [ "PAVMEip11", "AllocationId" ]},
-        "NetworkInterfaceId" : { "Ref" : "PAVMInterface11" }
-      }
-    },
-    "AssociateEIP12" : {
-      "Type" : "AWS::EC2::EIPAssociation",
-      "Properties" : {
-        "AllocationId" : { "Fn::GetAtt" : [ "PAVMEip12", "AllocationId" ]},
-        "NetworkInterfaceId" : { "Ref" : "PAVMInterface12" }
-      }
-    },
-    "AssociateEIP21" : {
-      "Type" : "AWS::EC2::EIPAssociation",
-      "Properties" : {
-        "AllocationId" : { "Fn::GetAtt" : [ "PAVMEip21", "AllocationId" ]},
-        "NetworkInterfaceId" : { "Ref" : "PAVMInterface21" }
-      }
-    },
-    "AssociateEIP22" : {
-      "Type" : "AWS::EC2::EIPAssociation",
-      "Properties" : {
-        "AllocationId" : { "Fn::GetAtt" : [ "PAVMEip22", "AllocationId" ]},
-        "NetworkInterfaceId" : { "Ref" : "PAVMInterface22" }
-      }
-    },
-    "PAVMInterface11" : {
-      "Type" : "AWS::EC2::NetworkInterface",
-      "Properties" : {
-        "Description" : "PAVMRevenueInterface1",
-        "SourceDestCheck" : "false",
-        "GroupSet" : [ {"Ref" : "PAVMSecurityGroup"} ],
-        "SubnetId" : { "Ref" : "VPCPubSub11"}
-      }
-    },
-    "PAVMInterface12" : {
-      "Type" : "AWS::EC2::NetworkInterface",
-      "Properties" : {
-        "Description" : "PAVMRevenueInterface1",
-        "SourceDestCheck" : "false",
-        "GroupSet" : [ {"Ref" : "PAVMSecurityGroup"} ],
-        "SubnetId" : { "Ref" : "VPCPubSub12"}
-      }
-    },
-    "PAVMInterface21" : {
-      "Type" : "AWS::EC2::NetworkInterface",
-      "Properties" : {
-        "Description" : "PAVMRevenueInterface1",
-        "SourceDestCheck" : "false",
-        "GroupSet" : [ {"Ref" : "PAVMSecurityGroup"} ],
-        "SubnetId" : { "Ref" : "VPCPubSub21"}
-      }
-    },
-    "PAVMInterface22" : {
-      "Type" : "AWS::EC2::NetworkInterface",
-      "Properties" : {
-        "Description" : "PAVMRevenueInterface1",
-        "SourceDestCheck" : "false",
-        "GroupSet" : [ {"Ref" : "PAVMSecurityGroup"} ],
-        "SubnetId" : { "Ref" : "VPCPubSub22"}
-      }
-    },
-    "VpcPAVM1" : {
-      "Type" : "AWS::EC2::Instance",
-      "Metadata" : {
-        "Comment1" : "Launch PAVM1"
-      },
-      "Properties" : {
-        "InstanceType" : { "Fn::FindInMap" : [ "PAVMInstance", { "Ref" : "PAVMType" }, "Type"] },
-        "KeyName" : { "Ref" : "KeyName" },
-        "DisableApiTermination" : {"Fn::If": ["EnableTerm", true, false ]},
-        "ImageId"        : { "Fn::FindInMap" : [ "PaloAltoPAVMAMI", { "Ref" : "AWS::Region" }, { "Ref" : "LicenseModel" } ] },
-        "NetworkInterfaces" : [ { "NetworkInterfaceId" : {"Ref" : "PAVMInterface11"}, "DeviceIndex" : "0" },
-                { "NetworkInterfaceId" : {"Ref" : "PAVMInterface12"}, "DeviceIndex" : "1" }],
-        "Tags" : [
-          { "Key" : "Name", "Value" : "Transit VPC PAVM1" }
-        ]
-      },
-      "DependsOn" : "IGW"
-    },
-    "VpcPAVM2" : {
-      "Type" : "AWS::EC2::Instance",
-      "Metadata" : {
-        "Comment1" : "Launch PAVM2"
-      },
-      "Properties" : {
-        "InstanceType" : { "Fn::FindInMap" : [ "PAVMInstance", { "Ref" : "PAVMType" }, "Type"] },
-        "KeyName" : { "Ref" : "KeyName" },
-        "DisableApiTermination" : {"Fn::If": ["EnableTerm", true, false ]},
-        "ImageId"        : { "Fn::FindInMap" : [ "PaloAltoPAVMAMI", { "Ref" : "AWS::Region" }, { "Ref" : "LicenseModel" } ] },
-        "NetworkInterfaces" : [ { "NetworkInterfaceId" : {"Ref" : "PAVMInterface21"}, "DeviceIndex" : "0" },
-                { "NetworkInterfaceId" : {"Ref" : "PAVMInterface22"}, "DeviceIndex" : "1" }],
-        "Tags" : [
-          { "Key" : "Name", "Value" : "Transit VPC PAVM2" }
-        ]
-      },
-      "DependsOn" : "IGW"
-    },
-    "SolutionHelperRole": {
-      "Type": "AWS::IAM::Role",
-      "Properties": {
-        "AssumeRolePolicyDocument": {
-          "Version" : "2012-10-17",
-          "Statement": [ {
-            "Effect": "Allow",
-            "Principal": {
-              "Service": "lambda.amazonaws.com"
+          "Id":"transit-vpc-1",
+          "Statement":[
+            {
+              "Sid":"Enable IAM User Permissions",
+              "Effect":"Allow",
+              "Principal":{
+                "AWS":[
+                  {
+                    "Fn::Join":[
+                      "",
+                      [
+                        "arn:aws:iam::",
+                        {
+                          "Ref":"AWS::AccountId"
+                        },
+                        ":root"
+                      ]
+                    ]
+                  }
+                ]
+              },
+              "Action":[
+                "kms:*"
+              ],
+              "Resource":"*"
             },
-            "Action": "sts:AssumeRole"
-          } ]
-        },
-        "Path": "/"
+            {
+              "Sid":"Allow use of the key",
+              "Effect":"Allow",
+              "Principal":{
+                "AWS":[
+                  {
+                    "Fn::Join":[
+                      "",
+                      [
+                        "arn:aws:iam::",
+                        {
+                          "Fn::If":[
+                            "AuthorizeAnotherAccount",
+                            {
+                              "Ref":"AccountId"
+                            },
+                            {
+                              "Ref":"AWS::AccountId"
+                            }
+                          ]
+                        },
+                        ":root"
+                      ]
+                    ]
+                  },
+                  {
+                    "Fn::GetAtt":[
+                      "SolutionHelperRole",
+                      "Arn"
+                    ]
+                  },
+                  {
+                    "Fn::GetAtt":[
+                      "PaloAltoConfigFunctionRole",
+                      "Arn"
+                    ]
+                  },
+                  {
+                    "Fn::GetAtt":[
+                      "TransitVpcPollerRole",
+                      "Arn"
+                    ]
+                  }
+                ]
+              },
+              "Action":[
+                "kms:Encrypt",
+                "kms:Decrypt",
+                "kms:ReEncrypt*",
+                "kms:GenerateDataKey*",
+                "kms:DescribeKey"
+              ],
+              "Resource":"*"
+            }
+          ]
+        }
       }
-   },
-    "SolutionHelperRolePolicy" : {
-      "Type": "AWS::IAM::Policy",
-      "Properties": {
-      "Roles" : [ { "Ref" : "SolutionHelperRole" } ],
-          "PolicyName": "Solution_Helper_Permissions",
-          "PolicyDocument": {
-              "Version" : "2012-10-17",
-          "Statement": [
-        {
-          "Effect": "Allow",
-          "Action": [
-            "logs:CreateLogGroup",
-            "logs:CreateLogStream",
-            "logs:PutLogEvents"
-          ],
-          "Resource": { "Fn::Join" : ["", ["arn:aws:logs:",{"Ref" : "AWS::Region"},":",{ "Ref" : "AWS::AccountId" }, ":log-group:/aws/lambda/*" ]]}
+    },
+    "TransitVPC":{
+      "Type":"AWS::EC2::VPC",
+      "Properties":{
+        "CidrBlock":{
+          "Ref":"VpcCidr"
         },
-        {
-          "Effect": "Allow",
-          "Action": [
-            "kms:Encrypt",
-            "kms:Decrypt",
-            "kms:ReEncrypt*",
-            "kms:GenerateDataKey*",
-            "kms:DescribeKey"
-          ],
-          "Resource": { "Fn::Join" : ["", ["arn:aws:kms:",{"Ref" : "AWS::Region"},":",{ "Ref" : "AWS::AccountId" }, ":key/", { "Ref" : "KMSKey" } ]]}
+        "Tags":[
+          {
+            "Key":"Name",
+            "Value":"Transit VPC"
+          }
+        ]
+      }
+    },
+    "VPCPubSub11":{
+      "Type":"AWS::EC2::Subnet",
+      "Properties":{
+        "VpcId":{
+          "Ref":"TransitVPC"
         },
-        {
-          "Effect": "Allow",
-          "Action": [
-                    "s3:PutBucketNotification"
-          ],
-          "Resource": { "Fn::Join": ["", ["arn:aws:s3:::", { "Ref" : "VPNConfigS3Bucket" } ]] }
+        "CidrBlock":{
+          "Ref":"PubSubnet11"
         },
-        {
-          "Effect": "Allow",
-          "Action": [
-            "lambda:*",
-            "events:*",
-            "ec2:DescribeSecurityGroups",
-            "ec2:DescribeSubnets",
+        "AvailabilityZone":{
+          "Fn::Select":[
+            "0",
+            {
+              "Fn::GetAZs":""
+            }
+          ]
+        },
+        "Tags":[
+          {
+            "Key":"Network",
+            "Value":"Public"
+          },
+          {
+            "Key":"Name",
+            "Value":"Transit VPC Subnet1"
+          }
+        ]
+      }
+    },
+    "VPCPubSub12":{
+      "Type":"AWS::EC2::Subnet",
+      "Properties":{
+        "VpcId":{
+          "Ref":"TransitVPC"
+        },
+        "CidrBlock":{
+          "Ref":"PubSubnet12"
+        },
+        "AvailabilityZone":{
+          "Fn::Select":[
+            "0",
+            {
+              "Fn::GetAZs":""
+            }
+          ]
+        },
+        "Tags":[
+          {
+            "Key":"Network",
+            "Value":"Public"
+          },
+          {
+            "Key":"Name",
+            "Value":"Transit VPC Subnet1"
+          }
+        ]
+      }
+    },
+    "VPCPubSub21":{
+      "Type":"AWS::EC2::Subnet",
+      "Properties":{
+        "VpcId":{
+          "Ref":"TransitVPC"
+        },
+        "CidrBlock":{
+          "Ref":"PubSubnet21"
+        },
+        "AvailabilityZone":{
+          "Fn::Select":[
+            "1",
+            {
+              "Fn::GetAZs":""
+            }
+          ]
+        },
+        "Tags":[
+          {
+            "Key":"Network",
+            "Value":"Public"
+          },
+          {
+            "Key":"Name",
+            "Value":"Transit VPC Subnet2"
+          }
+        ]
+      }
+    },
+    "VPCPubSub22":{
+      "Type":"AWS::EC2::Subnet",
+      "Properties":{
+        "VpcId":{
+          "Ref":"TransitVPC"
+        },
+        "CidrBlock":{
+          "Ref":"PubSubnet22"
+        },
+        "AvailabilityZone":{
+          "Fn::Select":[
+            "1",
+            {
+              "Fn::GetAZs":""
+            }
+          ]
+        },
+        "Tags":[
+          {
+            "Key":"Network",
+            "Value":"Public"
+          },
+          {
+            "Key":"Name",
+            "Value":"Transit VPC Subnet1"
+          }
+        ]
+      }
+    },
+    "IGW":{
+      "Type":"AWS::EC2::InternetGateway",
+      "Properties":{
+        "Tags":[
+          {
+            "Key":"Name",
+            "Value":"Transit VPC IGW"
+          }
+        ]
+      }
+    },
+    "IGWToInternet":{
+      "Type":"AWS::EC2::VPCGatewayAttachment",
+      "Properties":{
+        "VpcId":{
+          "Ref":"TransitVPC"
+        },
+        "InternetGatewayId":{
+          "Ref":"IGW"
+        }
+      }
+    },
+    "VPCRouteTable":{
+      "Type":"AWS::EC2::RouteTable",
+      "Properties":{
+        "VpcId":{
+          "Ref":"TransitVPC"
+        },
+        "Tags":[
+          {
+            "Key":"Network",
+            "Value":"Public"
+          },
+          {
+            "Key":"Name",
+            "Value":"Transit VPC"
+          }
+        ]
+      }
+    },
+    "VPCPublicRoute":{
+      "Type":"AWS::EC2::Route",
+      "Properties":{
+        "RouteTableId":{
+          "Ref":"VPCRouteTable"
+        },
+        "DestinationCidrBlock":"0.0.0.0/0",
+        "GatewayId":{
+          "Ref":"IGW"
+        }
+      }
+    },
+    "S3Endpoint":{
+      "Type":"AWS::EC2::VPCEndpoint",
+      "Properties":{
+        "PolicyDocument":{
+          "Version":"2012-10-17",
+          "Statement":[
+            {
+              "Effect":"Allow",
+              "Principal":"*",
+              "Action":[
+                "s3:*"
+              ],
+              "Resource":[
+                "*"
+              ]
+            }
+          ]
+        },
+        "RouteTableIds":[
+          {
+            "Ref":"VPCRouteTable"
+          }
+        ],
+        "ServiceName":{
+          "Fn::Join":[
+            "",
+            [
+              "com.amazonaws.",
+              {
+                "Ref":"AWS::Region"
+              },
+              ".s3"
+            ]
+          ]
+        },
+        "VpcId":{
+          "Ref":"TransitVPC"
+        }
+      }
+    },
+    "VPCPubSubnetRouteTableAssociation1":{
+      "Type":"AWS::EC2::SubnetRouteTableAssociation",
+      "Properties":{
+        "SubnetId":{
+          "Ref":"VPCPubSub11"
+        },
+        "RouteTableId":{
+          "Ref":"VPCRouteTable"
+        }
+      }
+    },
+    "VPCPubSubnetRouteTableAssociation2":{
+      "Type":"AWS::EC2::SubnetRouteTableAssociation",
+      "Properties":{
+        "SubnetId":{
+          "Ref":"VPCPubSub12"
+        },
+        "RouteTableId":{
+          "Ref":"VPCRouteTable"
+        }
+      }
+    },
+    "VPCPubSubnetRouteTableAssociation3":{
+      "Type":"AWS::EC2::SubnetRouteTableAssociation",
+      "Properties":{
+        "SubnetId":{
+          "Ref":"VPCPubSub21"
+        },
+        "RouteTableId":{
+          "Ref":"VPCRouteTable"
+        }
+      }
+    },
+    "VPCPubSubnetRouteTableAssociation4":{
+      "Type":"AWS::EC2::SubnetRouteTableAssociation",
+      "Properties":{
+        "SubnetId":{
+          "Ref":"VPCPubSub22"
+        },
+        "RouteTableId":{
+          "Ref":"VPCRouteTable"
+        }
+      }
+    },
+    "PAVMEip11":{
+      "Type":"AWS::EC2::EIP",
+      "Properties":{
+        "Domain":"vpc"
+      }
+    },
+    "PAVMEip12":{
+      "Type":"AWS::EC2::EIP",
+      "Properties":{
+        "Domain":"vpc"
+      }
+    },
+    "PAVMEip21":{
+      "Type":"AWS::EC2::EIP",
+      "Properties":{
+        "Domain":"vpc"
+      }
+    },
+    "PAVMEip22":{
+      "Type":"AWS::EC2::EIP",
+      "Properties":{
+        "Domain":"vpc"
+      }
+    },
+    "AssociateEIP11":{
+      "Type":"AWS::EC2::EIPAssociation",
+      "Properties":{
+        "AllocationId":{
+          "Fn::GetAtt":[
+            "PAVMEip11",
+            "AllocationId"
+          ]
+        },
+        "NetworkInterfaceId":{
+          "Ref":"PAVMInterface11"
+        }
+      }
+    },
+    "AssociateEIP12":{
+      "Type":"AWS::EC2::EIPAssociation",
+      "Properties":{
+        "AllocationId":{
+          "Fn::GetAtt":[
+            "PAVMEip12",
+            "AllocationId"
+          ]
+        },
+        "NetworkInterfaceId":{
+          "Ref":"PAVMInterface12"
+        }
+      }
+    },
+    "AssociateEIP21":{
+      "Type":"AWS::EC2::EIPAssociation",
+      "Properties":{
+        "AllocationId":{
+          "Fn::GetAtt":[
+            "PAVMEip21",
+            "AllocationId"
+          ]
+        },
+        "NetworkInterfaceId":{
+          "Ref":"PAVMInterface21"
+        }
+      }
+    },
+    "AssociateEIP22":{
+      "Type":"AWS::EC2::EIPAssociation",
+      "Properties":{
+        "AllocationId":{
+          "Fn::GetAtt":[
+            "PAVMEip22",
+            "AllocationId"
+          ]
+        },
+        "NetworkInterfaceId":{
+          "Ref":"PAVMInterface22"
+        }
+      }
+    },
+    "PAVMInterface11":{
+      "Type":"AWS::EC2::NetworkInterface",
+      "Properties":{
+        "Description":"PAVMRevenueInterface1",
+        "SourceDestCheck":"false",
+        "GroupSet":[
+          {
+            "Ref":"PAVMSecurityGroup"
+          }
+        ],
+        "SubnetId":{
+          "Ref":"VPCPubSub11"
+        }
+      }
+    },
+    "PAVMInterface12":{
+      "Type":"AWS::EC2::NetworkInterface",
+      "Properties":{
+        "Description":"PAVMRevenueInterface1",
+        "SourceDestCheck":"false",
+        "GroupSet":[
+          {
+            "Ref":"PAVMSecurityGroup"
+          }
+        ],
+        "SubnetId":{
+          "Ref":"VPCPubSub12"
+        }
+      }
+    },
+    "PAVMInterface21":{
+      "Type":"AWS::EC2::NetworkInterface",
+      "Properties":{
+        "Description":"PAVMRevenueInterface1",
+        "SourceDestCheck":"false",
+        "GroupSet":[
+          {
+            "Ref":"PAVMSecurityGroup"
+          }
+        ],
+        "SubnetId":{
+          "Ref":"VPCPubSub21"
+        }
+      }
+    },
+    "PAVMInterface22":{
+      "Type":"AWS::EC2::NetworkInterface",
+      "Properties":{
+        "Description":"PAVMRevenueInterface1",
+        "SourceDestCheck":"false",
+        "GroupSet":[
+          {
+            "Ref":"PAVMSecurityGroup"
+          }
+        ],
+        "SubnetId":{
+          "Ref":"VPCPubSub22"
+        }
+      }
+    },
+    "VpcPAVM1":{
+      "Type":"AWS::EC2::Instance",
+      "Metadata":{
+        "Comment1":"Launch PAVM1"
+      },
+      "Properties":{
+        "InstanceType":{
+          "Fn::FindInMap":[
+            "PAVMInstance",
+            {
+              "Ref":"PAVMType"
+            },
+            "Type"
+          ]
+        },
+        "KeyName":{
+          "Ref":"KeyName"
+        },
+        "DisableApiTermination":{
+          "Fn::If":[
+            "EnableTerm",
+            true,
+            false
+          ]
+        },
+        "ImageId":{
+          "Fn::FindInMap":[
+            "PaloAltoPAVMAMI",
+            {
+              "Ref":"AWS::Region"
+            },
+            {
+              "Ref":"LicenseModel"
+            }
+          ]
+        },
+        "NetworkInterfaces":[
+          {
+            "NetworkInterfaceId":{
+              "Ref":"PAVMInterface11"
+            },
+            "DeviceIndex":"0"
+          },
+          {
+            "NetworkInterfaceId":{
+              "Ref":"PAVMInterface12"
+            },
+            "DeviceIndex":"1"
+          }
+        ],
+        "Tags":[
+          {
+            "Key":"Name",
+            "Value":"Transit VPC PAVM1"
+          }
+        ]
+      },
+      "DependsOn":"IGW"
+    },
+    "VpcPAVM2":{
+      "Type":"AWS::EC2::Instance",
+      "Metadata":{
+        "Comment1":"Launch PAVM2"
+      },
+      "Properties":{
+        "InstanceType":{
+          "Fn::FindInMap":[
+            "PAVMInstance",
+            {
+              "Ref":"PAVMType"
+            },
+            "Type"
+          ]
+        },
+        "KeyName":{
+          "Ref":"KeyName"
+        },
+        "DisableApiTermination":{
+          "Fn::If":[
+            "EnableTerm",
+            true,
+            false
+          ]
+        },
+        "ImageId":{
+          "Fn::FindInMap":[
+            "PaloAltoPAVMAMI",
+            {
+              "Ref":"AWS::Region"
+            },
+            {
+              "Ref":"LicenseModel"
+            }
+          ]
+        },
+        "NetworkInterfaces":[
+          {
+            "NetworkInterfaceId":{
+              "Ref":"PAVMInterface21"
+            },
+            "DeviceIndex":"0"
+          },
+          {
+            "NetworkInterfaceId":{
+              "Ref":"PAVMInterface22"
+            },
+            "DeviceIndex":"1"
+          }
+        ],
+        "Tags":[
+          {
+            "Key":"Name",
+            "Value":"Transit VPC PAVM2"
+          }
+        ]
+      },
+      "DependsOn":"IGW"
+    },
+    "SolutionHelperRole":{
+      "Type":"AWS::IAM::Role",
+      "Properties":{
+        "AssumeRolePolicyDocument":{
+          "Version":"2012-10-17",
+          "Statement":[
+            {
+              "Effect":"Allow",
+              "Principal":{
+                "Service":"lambda.amazonaws.com"
+              },
+              "Action":"sts:AssumeRole"
+            }
+          ]
+        },
+        "Path":"/"
+      }
+    },
+    "SolutionHelperRolePolicy":{
+      "Type":"AWS::IAM::Policy",
+      "Properties":{
+        "Roles":[
+          {
+            "Ref":"SolutionHelperRole"
+          }
+        ],
+        "PolicyName":"Solution_Helper_Permissions",
+        "PolicyDocument":{
+          "Version":"2012-10-17",
+          "Statement":[
+            {
+              "Effect":"Allow",
+              "Action":[
+                "logs:CreateLogGroup",
+                "logs:CreateLogStream",
+                "logs:PutLogEvents"
+              ],
+              "Resource":{
+                "Fn::Join":[
+                  "",
+                  [
+                    "arn:aws:logs:",
+                    {
+                      "Ref":"AWS::Region"
+                    },
+                    ":",
+                    {
+                      "Ref":"AWS::AccountId"
+                    },
+                    ":log-group:/aws/lambda/*"
+                  ]
+                ]
+              }
+            },
+            {
+              "Effect":"Allow",
+              "Action":[
+                "kms:Encrypt",
+                "kms:Decrypt",
+                "kms:ReEncrypt*",
+                "kms:GenerateDataKey*",
+                "kms:DescribeKey"
+              ],
+              "Resource":{
+                "Fn::Join":[
+                  "",
+                  [
+                    "arn:aws:kms:",
+                    {
+                      "Ref":"AWS::Region"
+                    },
+                    ":",
+                    {
+                      "Ref":"AWS::AccountId"
+                    },
+                    ":key/",
+                    {
+                      "Ref":"KMSKey"
+                    }
+                  ]
+                ]
+              }
+            },
+            {
+              "Effect":"Allow",
+              "Action":[
+                "s3:PutBucketNotification"
+              ],
+              "Resource":{
+                "Fn::Join":[
+                  "",
+                  [
+                    "arn:aws:s3:::",
+                    {
+                      "Ref":"VPNConfigS3Bucket"
+                    }
+                  ]
+                ]
+              }
+            },
+            {
+              "Effect":"Allow",
+              "Action":[
+                "lambda:*",
+                "events:*",
+                "ec2:DescribeSecurityGroups",
+                "ec2:DescribeSubnets",
                 "ec2:DescribeVpcs"
-          ],
-          "Resource": "*"
-        },
-        {
-          "Effect": "Allow",
-          "Action": [
-            "iam:PassRole"
-          ],
-          "Resource": [{ "Fn::GetAtt" : [ "PaloAltoConfigFunctionRole", "Arn" ] }, { "Fn::GetAtt" : [ "TransitVpcPollerRole", "Arn" ] }]
-        },
-        {
-          "Effect": "Allow",
-          "Action": [
-                    "s3:PutObject",
-                    "s3:GetObject",
-                    "s3:DeleteObject"
-          ],
-          "Resource": { "Fn::Join": ["", ["arn:aws:s3:::", { "Ref" : "VPNConfigS3Bucket" }, "/", {"Ref": "S3Prefix"}, "*" ]] }
-        },
-        {
-          "Effect": "Allow",
-          "Action": [
-                    "s3:GetObject"
-          ],
-          "Resource": "arn:aws:s3:::solutions-reference/*"
-        }
-         ]
-        }
-      }
-   },
-    "SolutionHelper": {
-      "Type": "AWS::Lambda::Function",
-      "DependsOn" : "SolutionHelperRolePolicy",
-      "Properties": {
-        "Handler": "solution-helper.lambda_handler",
-        "Role": { "Fn::GetAtt" : [ "SolutionHelperRole" , "Arn" ] },
-        "Description": "Transit VPC: CloudFormation custom resource function invoked during transit VPC CloudFormation create, update, and delete stack operations.",
-        "Code": {
-          "S3Bucket": { "Fn::Join": ["", ["solutions-", {"Ref" : "AWS::Region"}]] },
-          "S3Key": "library/solution-helper/v3/solution-helper.zip"
-        },
-        "Runtime": "python2.7",
-        "Timeout": "60"
-     }
-   },
-   "CreateRsaKey": {
-     "Type": "Custom::LoadLambda",
-     "Properties": {
-       "ServiceToken": { "Fn::GetAtt" : ["SolutionHelper", "Arn"] },
-       "Region": { "Ref": "AWS::Region" },
-       "CreateSshKey" : { "Fn::Join": ["", [
-        "{ 'Bucket' : '",{ "Ref" : "VPNConfigS3Bucket" },"', ",
-        "'SSEKMSKeyId' : 'arn:aws:kms:",{"Ref" : "AWS::Region"},":",{ "Ref" : "AWS::AccountId" }, ":key/", { "Ref" : "KMSKey" }, "', ", 
-        "'PrivateKey' : '", { "Ref" : "S3Prefix" }, { "Fn::FindInMap" : [ "Function", "PAVM", "PrivateKey"]}, "', ", 
-        "'PublicKey' : '", { "Ref" : "S3Prefix" }, { "Fn::FindInMap" : [ "Function", "PAVM", "PublicKey"]}, "' ",
-        "}"
-    ]] }
-     }
-   },
-   "CreateRandomPassword": {
-     "Type": "Custom::LoadLambda",
-     "Properties": {
-       "ServiceToken": { "Fn::GetAtt" : ["SolutionHelper", "Arn"] },
-       "Region": { "Ref": "AWS::Region" },
-       "CreateRandomPassword" : { "Fn::FindInMap" : [ "Function", "PAVM", "PasswordLength"]},
-       "RandomPasswordSpecialCharacters": "False"
-     }
-   },
-   "PaloAltoConfigFunctionRole": {
-      "Type": "AWS::IAM::Role",
-      "Properties": {
-        "AssumeRolePolicyDocument": {
-          "Version" : "2012-10-17",
-          "Statement": [ {
-            "Effect": "Allow",
-            "Principal": {
-              "Service": "lambda.amazonaws.com"
+              ],
+              "Resource":"*"
             },
-            "Action": "sts:AssumeRole"
-          } ]
-        },
-        "Path": "/"
+            {
+              "Effect":"Allow",
+              "Action":[
+                "iam:PassRole"
+              ],
+              "Resource":[
+                {
+                  "Fn::GetAtt":[
+                    "PaloAltoConfigFunctionRole",
+                    "Arn"
+                  ]
+                },
+                {
+                  "Fn::GetAtt":[
+                    "TransitVpcPollerRole",
+                    "Arn"
+                  ]
+                }
+              ]
+            },
+            {
+              "Effect":"Allow",
+              "Action":[
+                "s3:PutObject",
+                "s3:GetObject",
+                "s3:DeleteObject"
+              ],
+              "Resource":{
+                "Fn::Join":[
+                  "",
+                  [
+                    "arn:aws:s3:::",
+                    {
+                      "Ref":"VPNConfigS3Bucket"
+                    },
+                    "/",
+                    {
+                      "Ref":"S3Prefix"
+                    },
+                    "*"
+                  ]
+                ]
+              }
+            },
+            {
+              "Effect":"Allow",
+              "Action":[
+                "s3:GetObject"
+              ],
+              "Resource":"arn:aws:s3:::solutions-reference/*"
+            }
+          ]
+        }
       }
-   },
-    "PaloAltoConfigFunctionRolePolicy" : {
-      "Type": "AWS::IAM::Policy",
-      "Properties": {
-      "Roles" : [ { "Ref" : "PaloAltoConfigFunctionRole" } ],
-          "PolicyName": "PaloAlto_Config_Permissions",
-          "PolicyDocument": {
-            "Version" : "2012-10-17",
-        "Statement": [
-        {
-          "Effect": "Allow",
-          "Action": [
-            "logs:CreateLogGroup",
-            "logs:CreateLogStream",
-            "logs:PutLogEvents"
-          ],
-          "Resource": { "Fn::Join" : ["", ["arn:aws:logs:",{"Ref" : "AWS::Region"},":",{ "Ref" : "AWS::AccountId" }, ":log-group:/aws/lambda/*" ]]}
+    },
+    "SolutionHelper":{
+      "Type":"AWS::Lambda::Function",
+      "DependsOn":"SolutionHelperRolePolicy",
+      "Properties":{
+        "Handler":"solution-helper.lambda_handler",
+        "Role":{
+          "Fn::GetAtt":[
+            "SolutionHelperRole",
+            "Arn"
+          ]
         },
-        {
-          "Effect": "Allow",
-          "Action": [
+        "Description":"Transit VPC: CloudFormation custom resource function invoked during transit VPC CloudFormation create, update, and delete stack operations.",
+        "Code":{
+          "S3Bucket":{
+            "Fn::Join":[
+              "",
+              [
+                "solutions-",
+                {
+                  "Ref":"AWS::Region"
+                }
+              ]
+            ]
+          },
+          "S3Key":"library/solution-helper/v3/solution-helper.zip"
+        },
+        "Runtime":"python2.7",
+        "Timeout":"60"
+      }
+    },
+    "CreateRsaKey":{
+      "Type":"Custom::LoadLambda",
+      "Properties":{
+        "ServiceToken":{
+          "Fn::GetAtt":[
+            "SolutionHelper",
+            "Arn"
+          ]
+        },
+        "Region":{
+          "Ref":"AWS::Region"
+        },
+        "CreateSshKey":{
+          "Fn::Join":[
+            "",
+            [
+              "{ 'Bucket' : '",
+              {
+                "Ref":"VPNConfigS3Bucket"
+              },
+              "', ",
+              "'SSEKMSKeyId' : 'arn:aws:kms:",
+              {
+                "Ref":"AWS::Region"
+              },
+              ":",
+              {
+                "Ref":"AWS::AccountId"
+              },
+              ":key/",
+              {
+                "Ref":"KMSKey"
+              },
+              "', ",
+              "'PrivateKey' : '",
+              {
+                "Ref":"S3Prefix"
+              },
+              {
+                "Fn::FindInMap":[
+                  "Function",
+                  "PAVM",
+                  "PrivateKey"
+                ]
+              },
+              "', ",
+              "'PublicKey' : '",
+              {
+                "Ref":"S3Prefix"
+              },
+              {
+                "Fn::FindInMap":[
+                  "Function",
+                  "PAVM",
+                  "PublicKey"
+                ]
+              },
+              "' ",
+              "}"
+            ]
+          ]
+        }
+      }
+    },
+    "CreateRandomPassword":{
+      "Type":"Custom::LoadLambda",
+      "Properties":{
+        "ServiceToken":{
+          "Fn::GetAtt":[
+            "SolutionHelper",
+            "Arn"
+          ]
+        },
+        "Region":{
+          "Ref":"AWS::Region"
+        },
+        "CreateRandomPassword":{
+          "Fn::FindInMap":[
+            "Function",
+            "PAVM",
+            "PasswordLength"
+          ]
+        },
+        "RandomPasswordSpecialCharacters":"False"
+      }
+    },
+    "PaloAltoConfigFunctionRole":{
+      "Type":"AWS::IAM::Role",
+      "Properties":{
+        "AssumeRolePolicyDocument":{
+          "Version":"2012-10-17",
+          "Statement":[
+            {
+              "Effect":"Allow",
+              "Principal":{
+                "Service":"lambda.amazonaws.com"
+              },
+              "Action":"sts:AssumeRole"
+            }
+          ]
+        },
+        "Path":"/"
+      }
+    },
+    "PaloAltoConfigFunctionRolePolicy":{
+      "Type":"AWS::IAM::Policy",
+      "Properties":{
+        "Roles":[
+          {
+            "Ref":"PaloAltoConfigFunctionRole"
+          }
+        ],
+        "PolicyName":"PaloAlto_Config_Permissions",
+        "PolicyDocument":{
+          "Version":"2012-10-17",
+          "Statement":[
+            {
+              "Effect":"Allow",
+              "Action":[
+                "logs:CreateLogGroup",
+                "logs:CreateLogStream",
+                "logs:PutLogEvents"
+              ],
+              "Resource":{
+                "Fn::Join":[
+                  "",
+                  [
+                    "arn:aws:logs:",
+                    {
+                      "Ref":"AWS::Region"
+                    },
+                    ":",
+                    {
+                      "Ref":"AWS::AccountId"
+                    },
+                    ":log-group:/aws/lambda/*"
+                  ]
+                ]
+              }
+            },
+            {
+              "Effect":"Allow",
+              "Action":[
                 "ec2:CreateNetworkInterface",
                 "ec2:DescribeNetworkInterfaces",
                 "ec2:DetachNetworkInterface",
                 "ec2:DeleteNetworkInterface"
-          ],
-          "Resource": "*"
-        },
-        {
-          "Effect": "Allow",
-          "Action": [
-            "kms:Encrypt",
-            "kms:Decrypt",
-            "kms:ReEncrypt*",
-            "kms:GenerateDataKey*",
-            "kms:DescribeKey"
-          ],
-          "Resource": { "Fn::Join" : ["", ["arn:aws:kms:",{"Ref" : "AWS::Region"},":",{ "Ref" : "AWS::AccountId" }, ":key/", { "Ref" : "KMSKey" } ]]}
-        },
-        {
-          "Effect": "Allow",
-          "Action": [
-                    "s3:PutObject",
-                    "s3:GetObject"
-          ],
-          "Resource": { "Fn::Join": ["", ["arn:aws:s3:::", { "Ref" : "VPNConfigS3Bucket" }, "/", {"Ref": "S3Prefix"}, "*" ]] }
-        }
-         ]
-        }
-      }
-   },
-   "PaloAltoConfigFunct": {
-     "Type": "Custom::LoadLambda",
-     "Properties": {
-       "ServiceToken": { "Fn::GetAtt" : ["SolutionHelper", "Arn"] },
-       "Region": { "Ref": "AWS::Region" },
-       "LambdaCode": { "Fn::FindInMap" : [ "Function", "Configurator", "CodeLocation"]},
-       "LambdaCodeRegion": { "Ref": "LambdaRegion" },
-       "FunctionName": { "Fn::Join": ["", [ { "Ref" : "AWS::StackName" }, "-", { "Fn::FindInMap" : [ "Function", "Configurator", "Name"]}   ]] },
-       "Role": { "Fn::GetAtt" : [ "PaloAltoConfigFunctionRole", "Arn" ] },
-       "Runtime": { "Fn::FindInMap" : [ "Function", "Configurator", "Runtime"]},
-       "Description": { "Fn::FindInMap" : [ "Function", "Configurator", "Description"]},
-       "Timeout": { "Fn::FindInMap" : [ "Function", "Configurator", "Timeout"]},
-       "MemorySize": { "Fn::FindInMap" : [ "Function", "Configurator", "MemorySize"]},
-       "VpcConfig" : { "Fn::Join": ["", [
-        "{ 'SubnetIds': [",
-            "'",{ "Ref" : "VPCPubSub11" }, "',",
-            "'",{ "Ref" : "VPCPubSub21" }, "'],",
-            "'SecurityGroupIds': [",
-                    "'",{ "Ref" : "PaloAltoConfigSecurityGroup" }, "']",
-            "}"
-    ]] },
-       "S3Event" : { "Fn::Join": ["", [
-        "{ 'Bucket' : '",{ "Ref" : "VPNConfigS3Bucket" },"', ",
-        "'EventPattern' : {",
-            "'LambdaFunctionConfigurations' : [ {",
-                        "'LambdaFunctionArn': 'Replace_by_SolutionHelper',",
-                        "'Events': ['s3:ObjectCreated:Put' ],",
-                        "'Filter': {",
-                            "'Key': {",
-                                "'FilterRules': [ {",
-                                    "'Name': 'prefix',",
-                                    "'Value': '",{ "Ref" : "S3Prefix" },"'",
-                                    "}, {",
-                                    "'Name': 'suffix',",
-                                    "'Value': '.conf'",
-                                    "} ] } }",
-                            "} ] }",
-        "}"
-    ]] },
-       "StoreInS3KMS" : { "Fn::Join": ["", [
-        "[{ 'Bucket' : '",{ "Ref" : "VPNConfigS3Bucket" },"', ",
-        "'Key' : '", { "Ref" : "S3Prefix" }, "transit_vpc_config.txt', ", 
-        "'SSEKMSKeyId' : 'arn:aws:kms:",{"Ref" : "AWS::Region"},":",{ "Ref" : "AWS::AccountId" }, ":key/", { "Ref" : "KMSKey" }, "', ", 
-        "'Body': \"{",
-            "'UUID':'",{"Fn::GetAtt": [ "CreateUniqueID", "UUID" ] },"',",
-            "'SENDDATA':'",{"Ref" : "SendAnonymousData"},"',",
-            "'EIP1':'",{ "Ref" : "PAVMEip12" },"',",
-            "'EIP2':'",{ "Ref" : "PAVMEip22" },"',",
-            "'PIP1':'",{ "Fn::GetAtt" : [ "VpcPAVM1", "PrivateIp" ] },"',",
-            "'PIP2':'",{ "Fn::GetAtt" : [ "VpcPAVM2", "PrivateIp" ] },"',",
-            "'BGP_ASN':",{ "Ref" : "BgpAsn" },",",
-            "'PREFERRED_PATH_TAG':'",{ "Ref" : "PreferredPathTag" },"',",
-            "'HUB_TAG':'",{ "Ref" : "SpokeTag" },"',",
-            "'HUB_TAG_VALUE':'",{ "Ref" : "SpokeTagValue" },"',",
-            "'USER_NAME':'",{ "Fn::FindInMap" : [ "Function", "PAVM", "UserName"]},"',",
-            "'PRIVATE_KEY':'",{ "Fn::FindInMap" : [ "Function", "PAVM", "PrivateKey"]},"',",
-            "'PUBLIC_KEY':'",{ "Fn::GetAtt" : [ "CreateRsaKey", "PubKey" ] },"',",
-            "'PASSWORD':'",{ "Fn::GetAtt" : [ "CreateRandomPassword" , "Password" ] },"',",
-            "'KMS_KEY':'arn:aws:kms:",{"Ref" : "AWS::Region"},":",{ "Ref" : "AWS::AccountId" }, ":key/", { "Ref" : "KMSKey" },"'",
-            "}\"",
-        "}]"
-    ]] }
-     }
-   },
-   "TransitVpcPollerRole": {
-      "Type": "AWS::IAM::Role",
-      "Properties": {
-        "AssumeRolePolicyDocument": {
-          "Version" : "2012-10-17",
-          "Statement": [ {
-            "Effect": "Allow",
-            "Principal": {
-              "Service": "lambda.amazonaws.com"
+              ],
+              "Resource":"*"
             },
-            "Action": "sts:AssumeRole"
-          } ]
-        },
-        "Path": "/"
-      }
-    },
-    "TransitVpcPollerRolePolicy" : {
-      "Type": "AWS::IAM::Policy",
-      "Properties": {
-      "Roles" : [ { "Ref" : "TransitVpcPollerRole" } ],
-          "PolicyName": "Transit_VPC_Poller_Function_Permissions",
-          "PolicyDocument": {
-              "Version" : "2012-10-17",
-          "Statement": [
-        {
-          "Effect": "Allow",
-          "Action": [
-            "logs:CreateLogGroup",
-            "logs:CreateLogStream",
-            "logs:PutLogEvents"
-          ],
-          "Resource": { "Fn::Join" : ["", ["arn:aws:logs:",{"Ref" : "AWS::Region"},":",{ "Ref" : "AWS::AccountId" }, ":log-group:/aws/lambda/*" ]]}
-        },
-        {
-          "Effect": "Allow",
-          "Action": [
-                    "ec2:Describe*",
-                    "ec2:CreateTags",
-                    "ec2:CreateCustomerGateway",
-                    "ec2:DeleteCustomerGateway",
-                    "ec2:CreateVpnConnection",
-                    "ec2:DeleteVpnConnection"
-          ],
-          "Resource": "*"
-        },
-        {
-          "Effect": "Allow",
-          "Action": [
-            "kms:Encrypt",
-            "kms:Decrypt",
-            "kms:ReEncrypt*",
-            "kms:GenerateDataKey*",
-            "kms:DescribeKey"
-          ],
-          "Resource": { "Fn::Join" : ["", ["arn:aws:kms:",{"Ref" : "AWS::Region"},":",{ "Ref" : "AWS::AccountId" }, ":key/", { "Ref" : "KMSKey" } ]]}
-        },
-        {
-          "Effect": "Allow",
-          "Action": [
-                    "s3:PutObject",
-                    "s3:PutObjectAcl",
-                    "s3:GetObject"
-          ],
-          "Resource": { "Fn::Join": ["", ["arn:aws:s3:::", { "Ref" : "VPNConfigS3Bucket" }, "/", {"Ref": "S3Prefix"}, "*"   ]] }
+            {
+              "Effect":"Allow",
+              "Action":[
+                "kms:Encrypt",
+                "kms:Decrypt",
+                "kms:ReEncrypt*",
+                "kms:GenerateDataKey*",
+                "kms:DescribeKey"
+              ],
+              "Resource":{
+                "Fn::Join":[
+                  "",
+                  [
+                    "arn:aws:kms:",
+                    {
+                      "Ref":"AWS::Region"
+                    },
+                    ":",
+                    {
+                      "Ref":"AWS::AccountId"
+                    },
+                    ":key/",
+                    {
+                      "Ref":"KMSKey"
+                    }
+                  ]
+                ]
+              }
+            },
+            {
+              "Effect":"Allow",
+              "Action":[
+                "s3:PutObject",
+                "s3:GetObject"
+              ],
+              "Resource":{
+                "Fn::Join":[
+                  "",
+                  [
+                    "arn:aws:s3:::",
+                    {
+                      "Ref":"VPNConfigS3Bucket"
+                    },
+                    "/",
+                    {
+                      "Ref":"S3Prefix"
+                    },
+                    "*"
+                  ]
+                ]
+              }
+            }
+          ]
         }
-         ]
-        }
-      } 
-    },
-   "PollerFunct": {
-     "DependsOn" : "PaloAltoConfigFunct",
-     "Type": "Custom::LoadLambda",
-     "Properties": {
-       "ServiceToken": { "Fn::GetAtt" : ["SolutionHelper", "Arn"] },
-       "Region": { "Ref": "AWS::Region" },
-       "LambdaCode": { "Fn::FindInMap" : [ "Function", "Poller", "CodeLocation"]},
-       "LambdaCodeRegion": { "Ref": "LambdaRegion" },
-       "Deliminator": { "Fn::FindInMap" : [ "Function", "FindReplace", "Deliminator"]},
-       "FunctionName": { "Fn::Join": ["", [ { "Ref" : "AWS::StackName" }, "-", { "Fn::FindInMap" : [ "Function", "Poller", "Name"]} ]] },
-       "Role": { "Fn::GetAtt" : [ "TransitVpcPollerRole", "Arn" ] },
-       "CloudWatchEvent" : { "Fn::Join": ["", [
-        "{ 'RuleName' : '",{ "Ref" : "AWS::StackName" },"-VGW-Poller-15min', ",
-        "'ScheduleExpression' : 'cron(*/15 * * * ? *)',",
-        "'Description': 'Transit VPC: Rule to trigger VGW-Poller every 15 minutes to find VGWs that need to be attached to the transit VPC.' }"
-    ]] },
-       "Runtime": { "Fn::FindInMap" : [ "Function", "Poller", "Runtime"]},
-       "Description": { "Fn::FindInMap" : [ "Function", "Poller", "Description"]},
-       "Timeout": { "Fn::FindInMap" : [ "Function", "Poller", "Timeout"]},
-       "MemorySize": { "Fn::FindInMap" : [ "Function", "Poller", "MemorySize"]},
-       "FindReplace" : { "Fn::Join": ["", [
-        { "Fn::FindInMap" : [ "Function", "FindReplace", "S3BucketID"]},
-        { "Fn::FindInMap" : [ "Function", "FindReplace", "Deliminator"]},
-        { "Ref" : "VPNConfigS3Bucket" },",",
-        { "Fn::FindInMap" : [ "Function", "FindReplace", "S3PrefixID"]},
-        { "Fn::FindInMap" : [ "Function", "FindReplace", "Deliminator"]},
-        { "Ref" : "S3Prefix" }
-    ]] }
-     }
-   },
-    "PAVMSecurityGroup" : {
-      "Type" : "AWS::EC2::SecurityGroup",
-      "Properties" : {
-        "GroupDescription" : "PAVM Security Group Rules",
-        "VpcId" : { "Ref" : "TransitVPC" },
-        "SecurityGroupIngress" : [
-           { "IpProtocol" : "-1", "FromPort" : "22",  "ToPort" : "22",  "SourceSecurityGroupId" : { "Ref" : "PaloAltoConfigSecurityGroup" }}
-           ],
-        "SecurityGroupEgress" : [
-           { "IpProtocol" : "-1", "FromPort" : "0", "ToPort" : "65535", "CidrIp" : "0.0.0.0/0" } ]
       }
     },
-    "PaloAltoConfigSecurityGroup" : {
-      "Type" : "AWS::EC2::SecurityGroup",
-      "Properties" : {
-        "GroupDescription" : "Transit VPC Automation Security Group Rules",
-        "VpcId" : { "Ref" : "TransitVPC" },
-        "SecurityGroupEgress" : [{ "IpProtocol" : "-1", "FromPort" : "443", "ToPort" : "443", "CidrIp" : "0.0.0.0/0" }]
-      }
-    },
-    "SSHtoPAVM": {
-      "Type": "AWS::EC2::SecurityGroupEgress",
+    "PaloAltoConfigFunct":{
+      "Type":"Custom::LoadLambda",
       "Properties":{
-        "IpProtocol": "tcp",
-        "FromPort": "22",
-        "ToPort": "22",
-        "DestinationSecurityGroupId": {
-          "Fn::GetAtt": [
+        "ServiceToken":{
+          "Fn::GetAtt":[
+            "SolutionHelper",
+            "Arn"
+          ]
+        },
+        "Region":{
+          "Ref":"AWS::Region"
+        },
+        "LambdaCode":{
+          "Fn::FindInMap":[
+            "Function",
+            "Configurator",
+            "CodeLocation"
+          ]
+        },
+        "LambdaCodeRegion":{
+          "Ref":"LambdaRegion"
+        },
+        "FunctionName":{
+          "Fn::Join":[
+            "",
+            [
+              {
+                "Ref":"AWS::StackName"
+              },
+              "-",
+              {
+                "Fn::FindInMap":[
+                  "Function",
+                  "Configurator",
+                  "Name"
+                ]
+              }
+            ]
+          ]
+        },
+        "Role":{
+          "Fn::GetAtt":[
+            "PaloAltoConfigFunctionRole",
+            "Arn"
+          ]
+        },
+        "Runtime":{
+          "Fn::FindInMap":[
+            "Function",
+            "Configurator",
+            "Runtime"
+          ]
+        },
+        "Description":{
+          "Fn::FindInMap":[
+            "Function",
+            "Configurator",
+            "Description"
+          ]
+        },
+        "Timeout":{
+          "Fn::FindInMap":[
+            "Function",
+            "Configurator",
+            "Timeout"
+          ]
+        },
+        "MemorySize":{
+          "Fn::FindInMap":[
+            "Function",
+            "Configurator",
+            "MemorySize"
+          ]
+        },
+        "VpcConfig":{
+          "Fn::Join":[
+            "",
+            [
+              "{ 'SubnetIds': [",
+              "'",
+              {
+                "Ref":"VPCPubSub11"
+              },
+              "',",
+              "'",
+              {
+                "Ref":"VPCPubSub21"
+              },
+              "'],",
+              "'SecurityGroupIds': [",
+              "'",
+              {
+                "Ref":"PaloAltoConfigSecurityGroup"
+              },
+              "']",
+              "}"
+            ]
+          ]
+        },
+        "S3Event":{
+          "Fn::Join":[
+            "",
+            [
+              "{ 'Bucket' : '",
+              {
+                "Ref":"VPNConfigS3Bucket"
+              },
+              "', ",
+              "'EventPattern' : {",
+              "'LambdaFunctionConfigurations' : [ {",
+              "'LambdaFunctionArn': 'Replace_by_SolutionHelper',",
+              "'Events': ['s3:ObjectCreated:Put' ],",
+              "'Filter': {",
+              "'Key': {",
+              "'FilterRules': [ {",
+              "'Name': 'prefix',",
+              "'Value': '",
+              {
+                "Ref":"S3Prefix"
+              },
+              "'",
+              "}, {",
+              "'Name': 'suffix',",
+              "'Value': '.conf'",
+              "} ] } }",
+              "} ] }",
+              "}"
+            ]
+          ]
+        },
+        "StoreInS3KMS":{
+          "Fn::Join":[
+            "",
+            [
+              "[{ 'Bucket' : '",
+              {
+                "Ref":"VPNConfigS3Bucket"
+              },
+              "', ",
+              "'Key' : '",
+              {
+                "Ref":"S3Prefix"
+              },
+              "transit_vpc_config.txt', ",
+              "'SSEKMSKeyId' : 'arn:aws:kms:",
+              {
+                "Ref":"AWS::Region"
+              },
+              ":",
+              {
+                "Ref":"AWS::AccountId"
+              },
+              ":key/",
+              {
+                "Ref":"KMSKey"
+              },
+              "', ",
+              "'Body': \"{",
+              "'UUID':'",
+              {
+                "Fn::GetAtt":[
+                  "CreateUniqueID",
+                  "UUID"
+                ]
+              },
+              "',",
+              "'SENDDATA':'",
+              {
+                "Ref":"SendAnonymousData"
+              },
+              "',",
+              "'EIP1':'",
+              {
+                "Ref":"PAVMEip12"
+              },
+              "',",
+              "'EIP2':'",
+              {
+                "Ref":"PAVMEip22"
+              },
+              "',",
+              "'PIP1':'",
+              {
+                "Fn::GetAtt":[
+                  "VpcPAVM1",
+                  "PrivateIp"
+                ]
+              },
+              "',",
+              "'PIP2':'",
+              {
+                "Fn::GetAtt":[
+                  "VpcPAVM2",
+                  "PrivateIp"
+                ]
+              },
+              "',",
+              "'BGP_ASN':",
+              {
+                "Ref":"BgpAsn"
+              },
+              ",",
+              "'PREFERRED_PATH_TAG':'",
+              {
+                "Ref":"PreferredPathTag"
+              },
+              "',",
+              "'HUB_TAG':'",
+              {
+                "Ref":"SpokeTag"
+              },
+              "',",
+              "'HUB_TAG_VALUE':'",
+              {
+                "Ref":"SpokeTagValue"
+              },
+              "',",
+              "'USER_NAME':'",
+              {
+                "Fn::FindInMap":[
+                  "Function",
+                  "PAVM",
+                  "UserName"
+                ]
+              },
+              "',",
+              "'PRIVATE_KEY':'",
+              {
+                "Fn::FindInMap":[
+                  "Function",
+                  "PAVM",
+                  "PrivateKey"
+                ]
+              },
+              "',",
+              "'PUBLIC_KEY':'",
+              {
+                "Fn::GetAtt":[
+                  "CreateRsaKey",
+                  "PubKey"
+                ]
+              },
+              "',",
+              "'PASSWORD':'",
+              {
+                "Fn::GetAtt":[
+                  "CreateRandomPassword",
+                  "Password"
+                ]
+              },
+              "',",
+              "'KMS_KEY':'arn:aws:kms:",
+              {
+                "Ref":"AWS::Region"
+              },
+              ":",
+              {
+                "Ref":"AWS::AccountId"
+              },
+              ":key/",
+              {
+                "Ref":"KMSKey"
+              },
+              "'",
+              "}\"",
+              "}]"
+            ]
+          ]
+        }
+      }
+    },
+    "TransitVpcPollerRole":{
+      "Type":"AWS::IAM::Role",
+      "Properties":{
+        "AssumeRolePolicyDocument":{
+          "Version":"2012-10-17",
+          "Statement":[
+            {
+              "Effect":"Allow",
+              "Principal":{
+                "Service":"lambda.amazonaws.com"
+              },
+              "Action":"sts:AssumeRole"
+            }
+          ]
+        },
+        "Path":"/"
+      }
+    },
+    "TransitVpcPollerRolePolicy":{
+      "Type":"AWS::IAM::Policy",
+      "Properties":{
+        "Roles":[
+          {
+            "Ref":"TransitVpcPollerRole"
+          }
+        ],
+        "PolicyName":"Transit_VPC_Poller_Function_Permissions",
+        "PolicyDocument":{
+          "Version":"2012-10-17",
+          "Statement":[
+            {
+              "Effect":"Allow",
+              "Action":[
+                "logs:CreateLogGroup",
+                "logs:CreateLogStream",
+                "logs:PutLogEvents"
+              ],
+              "Resource":{
+                "Fn::Join":[
+                  "",
+                  [
+                    "arn:aws:logs:",
+                    {
+                      "Ref":"AWS::Region"
+                    },
+                    ":",
+                    {
+                      "Ref":"AWS::AccountId"
+                    },
+                    ":log-group:/aws/lambda/*"
+                  ]
+                ]
+              }
+            },
+            {
+              "Effect":"Allow",
+              "Action":[
+                "ec2:Describe*",
+                "ec2:CreateTags",
+                "ec2:CreateCustomerGateway",
+                "ec2:DeleteCustomerGateway",
+                "ec2:CreateVpnConnection",
+                "ec2:DeleteVpnConnection"
+              ],
+              "Resource":"*"
+            },
+            {
+              "Effect":"Allow",
+              "Action":[
+                "kms:Encrypt",
+                "kms:Decrypt",
+                "kms:ReEncrypt*",
+                "kms:GenerateDataKey*",
+                "kms:DescribeKey"
+              ],
+              "Resource":{
+                "Fn::Join":[
+                  "",
+                  [
+                    "arn:aws:kms:",
+                    {
+                      "Ref":"AWS::Region"
+                    },
+                    ":",
+                    {
+                      "Ref":"AWS::AccountId"
+                    },
+                    ":key/",
+                    {
+                      "Ref":"KMSKey"
+                    }
+                  ]
+                ]
+              }
+            },
+            {
+              "Effect":"Allow",
+              "Action":[
+                "s3:PutObject",
+                "s3:PutObjectAcl",
+                "s3:GetObject"
+              ],
+              "Resource":{
+                "Fn::Join":[
+                  "",
+                  [
+                    "arn:aws:s3:::",
+                    {
+                      "Ref":"VPNConfigS3Bucket"
+                    },
+                    "/",
+                    {
+                      "Ref":"S3Prefix"
+                    },
+                    "*"
+                  ]
+                ]
+              }
+            }
+          ]
+        }
+      }
+    },
+    "PollerFunct":{
+      "DependsOn":"PaloAltoConfigFunct",
+      "Type":"Custom::LoadLambda",
+      "Properties":{
+        "ServiceToken":{
+          "Fn::GetAtt":[
+            "SolutionHelper",
+            "Arn"
+          ]
+        },
+        "Region":{
+          "Ref":"AWS::Region"
+        },
+        "LambdaCode":{
+          "Fn::FindInMap":[
+            "Function",
+            "Poller",
+            "CodeLocation"
+          ]
+        },
+        "LambdaCodeRegion":{
+          "Ref":"LambdaRegion"
+        },
+        "Deliminator":{
+          "Fn::FindInMap":[
+            "Function",
+            "FindReplace",
+            "Deliminator"
+          ]
+        },
+        "FunctionName":{
+          "Fn::Join":[
+            "",
+            [
+              {
+                "Ref":"AWS::StackName"
+              },
+              "-",
+              {
+                "Fn::FindInMap":[
+                  "Function",
+                  "Poller",
+                  "Name"
+                ]
+              }
+            ]
+          ]
+        },
+        "Role":{
+          "Fn::GetAtt":[
+            "TransitVpcPollerRole",
+            "Arn"
+          ]
+        },
+        "CloudWatchEvent":{
+          "Fn::Join":[
+            "",
+            [
+              "{ 'RuleName' : '",
+              {
+                "Ref":"AWS::StackName"
+              },
+              "-VGW-Poller-15min', ",
+              "'ScheduleExpression' : 'cron(*/15 * * * ? *)',",
+              "'Description': 'Transit VPC: Rule to trigger VGW-Poller every 15 minutes to find VGWs that need to be attached to the transit VPC.' }"
+            ]
+          ]
+        },
+        "Runtime":{
+          "Fn::FindInMap":[
+            "Function",
+            "Poller",
+            "Runtime"
+          ]
+        },
+        "Description":{
+          "Fn::FindInMap":[
+            "Function",
+            "Poller",
+            "Description"
+          ]
+        },
+        "Timeout":{
+          "Fn::FindInMap":[
+            "Function",
+            "Poller",
+            "Timeout"
+          ]
+        },
+        "MemorySize":{
+          "Fn::FindInMap":[
+            "Function",
+            "Poller",
+            "MemorySize"
+          ]
+        },
+        "FindReplace":{
+          "Fn::Join":[
+            "",
+            [
+              {
+                "Fn::FindInMap":[
+                  "Function",
+                  "FindReplace",
+                  "S3BucketID"
+                ]
+              },
+              {
+                "Fn::FindInMap":[
+                  "Function",
+                  "FindReplace",
+                  "Deliminator"
+                ]
+              },
+              {
+                "Ref":"VPNConfigS3Bucket"
+              },
+              ",",
+              {
+                "Fn::FindInMap":[
+                  "Function",
+                  "FindReplace",
+                  "S3PrefixID"
+                ]
+              },
+              {
+                "Fn::FindInMap":[
+                  "Function",
+                  "FindReplace",
+                  "Deliminator"
+                ]
+              },
+              {
+                "Ref":"S3Prefix"
+              }
+            ]
+          ]
+        }
+      }
+    },
+    "PAVMSecurityGroup":{
+      "Type":"AWS::EC2::SecurityGroup",
+      "Properties":{
+        "GroupDescription":"PAVM Security Group Rules",
+        "VpcId":{
+          "Ref":"TransitVPC"
+        },
+        "SecurityGroupIngress":[
+          {
+            "IpProtocol":"-1",
+            "FromPort":"22",
+            "ToPort":"22",
+            "SourceSecurityGroupId":{
+              "Ref":"PaloAltoConfigSecurityGroup"
+            }
+          }
+        ],
+        "SecurityGroupEgress":[
+          {
+            "IpProtocol":"-1",
+            "FromPort":"0",
+            "ToPort":"65535",
+            "CidrIp":"0.0.0.0/0"
+          }
+        ]
+      }
+    },
+    "PaloAltoConfigSecurityGroup":{
+      "Type":"AWS::EC2::SecurityGroup",
+      "Properties":{
+        "GroupDescription":"Transit VPC Automation Security Group Rules",
+        "VpcId":{
+          "Ref":"TransitVPC"
+        },
+        "SecurityGroupEgress":[
+          {
+            "IpProtocol":"-1",
+            "FromPort":"443",
+            "ToPort":"443",
+            "CidrIp":"0.0.0.0/0"
+          }
+        ]
+      }
+    },
+    "SSHtoPAVM":{
+      "Type":"AWS::EC2::SecurityGroupEgress",
+      "Properties":{
+        "IpProtocol":"tcp",
+        "FromPort":"22",
+        "ToPort":"22",
+        "DestinationSecurityGroupId":{
+          "Fn::GetAtt":[
             "PAVMSecurityGroup",
             "GroupId"
           ]
         },
-        "GroupId": {
-          "Fn::GetAtt": [
+        "GroupId":{
+          "Fn::GetAtt":[
             "PaloAltoConfigSecurityGroup",
             "GroupId"
           ]
         }
       }
     },
-    "PAVM1RecoveryAlarm": {
-      "Type": "AWS::CloudWatch::Alarm",
-      "Properties": {
-        "AlarmDescription": "Trigger a recovery when PAVM1 instance status check fails for 15 consecutive minutes.",
-        "Namespace": "AWS/EC2" ,
-        "MetricName": "StatusCheckFailed_System",
-        "Statistic": "Minimum",
-        "Period": "60",
-        "EvaluationPeriods": "35",
-        "ComparisonOperator": "GreaterThanThreshold",
-        "Threshold": "0",
-        "AlarmActions": [ {"Fn::Join" : ["", ["arn:aws:automate:", { "Ref" : "AWS::Region" }, ":ec2:recover" ]]} ],
-        "Dimensions": [{"Name": "InstanceId","Value": {"Ref": "VpcPAVM1"}}]
-      }
-    },
-    "PAVM2RecoveryAlarm": {
-      "Type": "AWS::CloudWatch::Alarm",
-      "Properties": {
-        "AlarmDescription": "Trigger a recovery when PAVM2 instance status check fails for 15 consecutive minutes.",
-        "Namespace": "AWS/EC2" ,
-        "MetricName": "StatusCheckFailed_System",
-        "Statistic": "Minimum",
-        "Period": "60",
-        "EvaluationPeriods": "35",
-        "ComparisonOperator": "GreaterThanThreshold",
-        "Threshold": "0",
-        "AlarmActions": [ {"Fn::Join" : ["", ["arn:aws:automate:", { "Ref" : "AWS::Region" }, ":ec2:recover" ]]} ],
-        "Dimensions": [{"Name": "InstanceId","Value": {"Ref": "VpcPAVM2"}}]
-      }
-    },
-    "CreateUniqueID": {
-         "Type": "Custom::LoadLambda",
-         "Properties": {
-             "ServiceToken": { "Fn::GetAtt": ["SolutionHelper", "Arn"] },
-             "Region": { "Ref": "AWS::Region" },
-             "CreateUniqueID": "true"
-         }
-    },
-    "SendingData": {
-        "Type": "Custom::LoadLambda",
-        "Condition" : "SendData",
-        "Properties": {
-            "ServiceToken": { "Fn::GetAtt": ["SolutionHelper", "Arn"] },
-            "SendAnonymousData": { "Fn::Join": ["", [
-                "{ 'Solution' : '", "SO0001", "', ",
-                  "'UUID' : '", {"Fn::GetAtt": ["CreateUniqueID", "UUID"]}, "', ",
-                  "'Data': {", "'PAVMType': '", {"Ref": "PAVMType"}, "',",
-                               "'LicenseModel': '", {"Ref": "LicenseModel"}, "'",
-                          "}",
-                "}"
-              ]]
+    "PAVM1RecoveryAlarm":{
+      "Type":"AWS::CloudWatch::Alarm",
+      "Properties":{
+        "AlarmDescription":"Trigger a recovery when PAVM1 instance status check fails for 15 consecutive minutes.",
+        "Namespace":"AWS/EC2",
+        "MetricName":"StatusCheckFailed_System",
+        "Statistic":"Minimum",
+        "Period":"60",
+        "EvaluationPeriods":"35",
+        "ComparisonOperator":"GreaterThanThreshold",
+        "Threshold":"0",
+        "AlarmActions":[
+          {
+            "Fn::Join":[
+              "",
+              [
+                "arn:aws:automate:",
+                {
+                  "Ref":"AWS::Region"
+                },
+                ":ec2:recover"
+              ]
+            ]
+          }
+        ],
+        "Dimensions":[
+          {
+            "Name":"InstanceId",
+            "Value":{
+              "Ref":"VpcPAVM1"
             }
+          }
+        ]
+      }
+    },
+    "PAVM2RecoveryAlarm":{
+      "Type":"AWS::CloudWatch::Alarm",
+      "Properties":{
+        "AlarmDescription":"Trigger a recovery when PAVM2 instance status check fails for 15 consecutive minutes.",
+        "Namespace":"AWS/EC2",
+        "MetricName":"StatusCheckFailed_System",
+        "Statistic":"Minimum",
+        "Period":"60",
+        "EvaluationPeriods":"35",
+        "ComparisonOperator":"GreaterThanThreshold",
+        "Threshold":"0",
+        "AlarmActions":[
+          {
+            "Fn::Join":[
+              "",
+              [
+                "arn:aws:automate:",
+                {
+                  "Ref":"AWS::Region"
+                },
+                ":ec2:recover"
+              ]
+            ]
+          }
+        ],
+        "Dimensions":[
+          {
+            "Name":"InstanceId",
+            "Value":{
+              "Ref":"VpcPAVM2"
+            }
+          }
+        ]
+      }
+    },
+    "CreateUniqueID":{
+      "Type":"Custom::LoadLambda",
+      "Properties":{
+        "ServiceToken":{
+          "Fn::GetAtt":[
+            "SolutionHelper",
+            "Arn"
+          ]
+        },
+        "Region":{
+          "Ref":"AWS::Region"
+        },
+        "CreateUniqueID":"true"
+      }
+    },
+    "SendingData":{
+      "Type":"Custom::LoadLambda",
+      "Condition":"SendData",
+      "Properties":{
+        "ServiceToken":{
+          "Fn::GetAtt":[
+            "SolutionHelper",
+            "Arn"
+          ]
+        },
+        "SendAnonymousData":{
+          "Fn::Join":[
+            "",
+            [
+              "{ 'Solution' : '",
+              "SO0001",
+              "', ",
+              "'UUID' : '",
+              {
+                "Fn::GetAtt":[
+                  "CreateUniqueID",
+                  "UUID"
+                ]
+              },
+              "', ",
+              "'Data': {",
+              "'PAVMType': '",
+              {
+                "Ref":"PAVMType"
+              },
+              "',",
+              "'LicenseModel': '",
+              {
+                "Ref":"LicenseModel"
+              },
+              "'",
+              "}",
+              "}"
+            ]
+          ]
         }
+      }
     }
   },
-  "Outputs" : {
-    "PAVM1" : {
-      "Description" : "IP Address for PAVM1",
-      "Value" : { "Fn::GetAtt" : [ "VpcPAVM1", "PublicIp" ] } 
+  "Outputs":{
+    "PAVM1":{
+      "Description":"IP Address for PAVM1",
+      "Value":{
+        "Fn::GetAtt":[
+          "VpcPAVM1",
+          "PublicIp"
+        ]
+      }
     },
-    "PAVM2" : {
-      "Description" : "IP Address for PAVM2",
-      "Value" : { "Fn::GetAtt" : [ "VpcPAVM2", "PublicIp" ] } 
+    "PAVM2":{
+      "Description":"IP Address for PAVM2",
+      "Value":{
+        "Fn::GetAtt":[
+          "VpcPAVM2",
+          "PublicIp"
+        ]
+      }
     },
-    "ConfigS3Bucket" : {
-      "Description" : "S3 bucket for storing VPN configuration information.",
-      "Value" : { "Ref" : "VPNConfigS3Bucket" } 
+    "ConfigS3Bucket":{
+      "Description":"S3 bucket for storing VPN configuration information.",
+      "Value":{
+        "Ref":"VPNConfigS3Bucket"
+      }
     },
-    "BucketPrefix" : {
-      "Description" : "S3 prefix for storing VPN configuration information.",
-      "Value" : { "Ref" : "S3Prefix" } 
+    "BucketPrefix":{
+      "Description":"S3 prefix for storing VPN configuration information.",
+      "Value":{
+        "Ref":"S3Prefix"
+      }
     },
-    "SpokeVPCTag" : {
-      "Description" : "Tag used to identify spoke VPCs.",
-      "Value" : { "Ref": "SpokeTag" } 
+    "SpokeVPCTag":{
+      "Description":"Tag used to identify spoke VPCs.",
+      "Value":{
+        "Ref":"SpokeTag"
+      }
     },
-    "SpokeVPCTagValue" : {
-      "Description" : "Tag valued used to idenfity spoke VPCs.",
-      "Value" : { "Ref": "SpokeTagValue" } 
+    "SpokeVPCTagValue":{
+      "Description":"Tag valued used to idenfity spoke VPCs.",
+      "Value":{
+        "Ref":"SpokeTagValue"
+      }
     },
-    "PreferredPathTagName" : {
-      "Description" : "Tag used to identify the spoke VPC preferred path.",
-      "Value" : { "Ref": "PreferredPathTag" } 
+    "PreferredPathTagName":{
+      "Description":"Tag used to identify the spoke VPC preferred path.",
+      "Value":{
+        "Ref":"PreferredPathTag"
+      }
     },
-    "UUID": {
-      "Description": "Newly created random UUID.",
-      "Value": { "Fn::GetAtt": [ "CreateUniqueID", "UUID" ] } 
+    "UUID":{
+      "Description":"Newly created random UUID.",
+      "Value":{
+        "Fn::GetAtt":[
+          "CreateUniqueID",
+          "UUID"
+        ]
+      }
     }
   }
 }
