@@ -1,5 +1,5 @@
 # aws-transit-vpc for Palo Alto Firewalls
-Source code for the AWS Transit VPC customized to use Palo Alto VM appliances versus Cisco's CSR. The goal with this project is to insert NGFW inspection and ultimately better network visibility into all inter-VPC communication, something lacking in with the existing design.  
+Source code for the AWS Transit VPC customized to use Palo Alto VM appliances versus Cisco's CSR. The goal with this project is to insert NGFW inspection and ultimately better network visibility into all inter-VPC communication, something lacking in the existing Cisco design.  
 Forked from https://github.com/awslabs/aws-transit-vpc  
 
 *Disclaimer: This personal project is in no way associated, officially or unofficially, with Palo Alto Networks. Use at your own risk.*
